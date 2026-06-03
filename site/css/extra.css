@@ -1,0 +1,44 @@
+/* 清新风格的额外样式 */
+.md-content {
+  max-width: 980px;
+}
+
+.md-typeset h1,
+.md-typeset h2,
+.md-typeset h3,
+.md-typeset h4 {
+  color: #094c69;
+}
+
+.md-typeset h1 {
+  border-bottom: 2px solid rgba(15, 118, 186, 0.16);
+}
+
+.md-typeset p,
+.md-typeset li,
+.md-typeset blockquote {
+  color: #334e68;
+}
+
+.md-typeset blockquote {
+  border-left-color: #7dd3fc;
+  background: rgba(56, 189, 248, 0.08);
+}
+
+.md-typeset code {
+  color: #155e75;
+  background-color: rgba(187, 247, 208, 0.28);
+}
+
+.md-typeset pre {
+  border-radius: 14px;
+  background: rgba(15, 118, 186, 0.08);
+}
+
+.theme-doc-sidebar {
+  background: rgba(255, 255, 255, 0.92);
+}
+
+.md-header-nav__secondary {
+  background: rgba(255, 255, 255, 0.88);
+}

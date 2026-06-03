@@ -1,0 +1,852 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>BBQ / Catering Lead Generation System | 项目详情</title>
+  <link rel="stylesheet" href="../style.css" />
+  <style>
+    /* ---- page overrides ---- */
+    .detail-shell {
+      position: relative; z-index: 1;
+      max-width: 1020px; margin: 0 auto;
+      padding: 36px 24px 60px;
+    }
+    .back-bar { margin-bottom: 28px; }
+
+    /* ---- glass panel ---- */
+    .glass {
+      border-radius: 24px; padding: 32px;
+      background: var(--glass-bg);
+      border: 1.5px solid var(--glass-border);
+      box-shadow: 0 4px 28px var(--glass-shadow), inset 0 1px 0 rgba(255,255,255,0.7);
+      backdrop-filter: blur(18px) saturate(1.2);
+      -webkit-backdrop-filter: blur(18px) saturate(1.2);
+      margin-bottom: 28px; position: relative; overflow: hidden;
+    }
+    .glass::before {
+      content: ""; position: absolute; top: 0; left: 0; right: 0; height: 4px;
+      border-radius: 24px 24px 0 0;
+      background: linear-gradient(90deg, var(--accent-purple), var(--accent-pink), var(--accent-cyan));
+    }
+
+    /* ---- detail hero ---- */
+    .detail-hero { padding: 52px 36px; text-align: center; }
+    .detail-hero h1 {
+      font-size: clamp(1.8rem, 3.5vw, 2.8rem);
+      background: linear-gradient(135deg, #7B4FBF, #D4618C, #5B8FD4);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      background-clip: text; margin: 0 0 14px;
+    }
+    .detail-hero .subtitle {
+      color: var(--text-mid); font-size: 1.08rem; max-width: 660px; margin: 0 auto 22px;
+    }
+    .badge-row { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; }
+    .badge {
+      display: inline-flex; align-items: center; gap: 5px;
+      padding: 6px 14px; border-radius: 999px; font-size: 0.78rem; font-weight: 600;
+      border: 1px solid;
+    }
+    .badge--purple { background: rgba(168,124,219,0.18); color: #7B4FBF; border-color: rgba(168,124,219,0.3); }
+    .badge--pink   { background: rgba(242,167,195,0.18); color: #C4587A; border-color: rgba(242,167,195,0.3); }
+    .badge--cyan   { background: rgba(126,200,227,0.18); color: #3A8BAD; border-color: rgba(126,200,227,0.3); }
+    .badge--gold   { background: rgba(245,197,106,0.18); color: #B8860B; border-color: rgba(245,197,106,0.3); }
+
+    /* ---- section title ---- */
+    .sec-title {
+      display: flex; align-items: center; gap: 10px;
+      margin: 0 0 18px; font-size: 1.2rem; color: var(--text-dark);
+    }
+    .sec-icon {
+      display: flex; align-items: center; justify-content: center;
+      width: 34px; height: 34px; border-radius: 10px; flex-shrink: 0;
+    }
+    .icon--purple { background: linear-gradient(135deg, rgba(168,124,219,0.25), rgba(168,124,219,0.08)); }
+    .icon--pink   { background: linear-gradient(135deg, rgba(242,167,195,0.25), rgba(242,167,195,0.08)); }
+    .icon--cyan   { background: linear-gradient(135deg, rgba(126,200,227,0.25), rgba(126,200,227,0.08)); }
+    .icon--gold   { background: linear-gradient(135deg, rgba(245,197,106,0.25), rgba(245,197,106,0.08)); }
+
+    /* ---- architecture diagram ---- */
+    .arch-flow {
+      display: flex; align-items: center; flex-wrap: wrap; gap: 8px;
+      padding: 20px 0; justify-content: center;
+    }
+    .arch-node {
+      padding: 12px 18px; border-radius: 16px; font-size: 0.85rem; font-weight: 700;
+      text-align: center; min-width: 110px; line-height: 1.35;
+    }
+    .arch-node--purple { background: rgba(168,124,219,0.2); color: #7B4FBF; border: 1.5px solid rgba(168,124,219,0.35); }
+    .arch-node--pink   { background: rgba(242,167,195,0.2); color: #C4587A; border: 1.5px solid rgba(242,167,195,0.35); }
+    .arch-node--cyan   { background: rgba(126,200,227,0.2); color: #3A8BAD; border: 1.5px solid rgba(126,200,227,0.35); }
+    .arch-node--gold   { background: rgba(245,197,106,0.2); color: #B8860B; border: 1.5px solid rgba(245,197,106,0.35); }
+    .arch-arrow { color: var(--text-light); font-size: 1.2rem; }
+
+    /* ---- file tree ---- */
+    .file-tree {
+      font-family: "Cascadia Code", "Fira Code", "Consolas", monospace;
+      font-size: 0.82rem; line-height: 1.85; color: var(--text-mid);
+      background: rgba(255,255,255,0.45); border-radius: 16px; padding: 20px 24px;
+      border: 1px solid rgba(200,180,230,0.25);
+    }
+    .file-tree .dir { color: var(--accent-purple); font-weight: 700; }
+    .file-tree .file { color: var(--text-mid); }
+    .file-tree .comment { color: var(--text-light); font-style: italic; }
+
+    /* ---- code block ---- */
+    .code-block {
+      font-family: "Cascadia Code", "Fira Code", "Consolas", monospace;
+      font-size: 0.82rem; line-height: 1.7;
+      background: rgba(60,40,90,0.92); color: #E8D5F5;
+      border-radius: 16px; padding: 22px 24px;
+      overflow-x: auto; white-space: pre; position: relative;
+      border: 1px solid rgba(168,124,219,0.3);
+    }
+    .code-block .kw  { color: #C9A7EB; }
+    .code-block .str { color: #A8E6CF; }
+    .code-block .fn  { color: #87CEEB; }
+    .code-block .cm  { color: #9A8BB5; }
+    .code-block .num { color: #F5C56A; }
+
+    /* ---- API table ---- */
+    .api-table {
+      width: 100%; border-collapse: collapse; font-size: 0.9rem;
+    }
+    .api-table th {
+      text-align: left; padding: 12px 16px; font-weight: 700;
+      background: rgba(168,124,219,0.12); color: var(--text-dark);
+      border-bottom: 2px solid rgba(168,124,219,0.2);
+    }
+    .api-table td {
+      padding: 12px 16px; border-bottom: 1px solid rgba(200,180,230,0.2);
+      color: var(--text-mid);
+    }
+    .api-table tr:last-child td { border-bottom: none; }
+    .api-table code {
+      background: rgba(168,124,219,0.12); padding: 2px 8px; border-radius: 6px;
+      font-family: "Cascadia Code", "Fira Code", monospace; font-size: 0.85em;
+      color: var(--accent-purple);
+    }
+    .method-get {
+      display: inline-block; padding: 2px 10px; border-radius: 6px;
+      background: rgba(126,200,227,0.2); color: #3A8BAD; font-weight: 700;
+      font-size: 0.75rem; font-family: monospace;
+    }
+    .method-post {
+      display: inline-block; padding: 2px 10px; border-radius: 6px;
+      background: rgba(242,167,195,0.2); color: #C4587A; font-weight: 700;
+      font-size: 0.75rem; font-family: monospace;
+    }
+
+    /* ---- env table ---- */
+    .env-table { width: 100%; border-collapse: collapse; font-size: 0.88rem; }
+    .env-table th {
+      text-align: left; padding: 10px 14px; font-weight: 700;
+      background: rgba(245,197,106,0.12); color: var(--text-dark);
+      border-bottom: 2px solid rgba(245,197,106,0.2);
+    }
+    .env-table td {
+      padding: 10px 14px; border-bottom: 1px solid rgba(200,180,230,0.15);
+      color: var(--text-mid);
+    }
+    .env-table code {
+      background: rgba(245,197,106,0.15); padding: 2px 8px; border-radius: 6px;
+      font-family: monospace; font-size: 0.85em; color: #B8860B;
+    }
+    .env-required {
+      display: inline-block; padding: 1px 8px; border-radius: 6px;
+      background: rgba(242,167,195,0.2); color: #C4587A; font-size: 0.72rem;
+      font-weight: 700; margin-left: 6px;
+    }
+    .env-optional {
+      display: inline-block; padding: 1px 8px; border-radius: 6px;
+      background: rgba(126,200,227,0.15); color: #3A8BAD; font-size: 0.72rem;
+      font-weight: 700; margin-left: 6px;
+    }
+
+    /* ---- schema block ---- */
+    .schema-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 10px; margin-top: 14px;
+    }
+    .schema-col {
+      padding: 10px 14px; border-radius: 12px;
+      background: rgba(255,255,255,0.5); border: 1px solid rgba(200,180,230,0.2);
+      font-size: 0.85rem;
+    }
+    .schema-col .col-name {
+      font-weight: 700; color: var(--text-dark); font-family: monospace;
+    }
+    .schema-col .col-type { color: var(--text-light); font-size: 0.78rem; }
+
+    /* ---- pipeline steps ---- */
+    .pipeline-steps {
+      display: grid; gap: 14px; margin-top: 8px;
+    }
+    .p-step {
+      display: flex; gap: 16px; align-items: flex-start;
+      padding: 18px 20px; border-radius: 16px;
+      background: rgba(255,255,255,0.45); border: 1px solid rgba(200,180,230,0.2);
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    .p-step:hover {
+      transform: translateX(4px);
+      box-shadow: 0 4px 16px rgba(168,124,219,0.15);
+    }
+    .p-step-num {
+      display: flex; align-items: center; justify-content: center;
+      width: 36px; height: 36px; border-radius: 50%; flex-shrink: 0;
+      font-weight: 800; font-size: 0.9rem;
+      background: linear-gradient(135deg, var(--accent-purple), var(--accent-pink));
+      color: white;
+    }
+    .p-step-body h4 { margin: 0 0 4px; font-size: 0.95rem; color: var(--text-dark); }
+    .p-step-body p  { margin: 0; font-size: 0.88rem; color: var(--text-mid); }
+
+    /* ---- module cards ---- */
+    .module-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 14px; margin-top: 8px;
+    }
+    .mod-card {
+      padding: 20px; border-radius: 18px;
+      background: rgba(255,255,255,0.5); border: 1px solid rgba(200,180,230,0.2);
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    .mod-card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 24px rgba(168,124,219,0.18);
+    }
+    .mod-card h4 { margin: 0 0 8px; color: var(--text-dark); font-size: 0.95rem; }
+    .mod-card .mod-path {
+      font-family: monospace; font-size: 0.76rem; color: var(--accent-purple);
+      margin-bottom: 8px; display: block;
+    }
+    .mod-card p { margin: 0; font-size: 0.87rem; color: var(--text-mid); }
+
+    /* ---- media / video ---- */
+    .media-box { margin-top: 12px; }
+    .media-box video {
+      width: 100%; max-width: 720px; border-radius: 16px;
+      box-shadow: 0 8px 30px rgba(168,124,219,0.2);
+      border: 1.5px solid rgba(200,180,230,0.25);
+    }
+    .media-box .download-link {
+      display: inline-flex; align-items: center; gap: 6px; margin-top: 12px;
+      color: var(--accent-purple); font-size: 0.88rem; text-decoration: none;
+      font-weight: 600;
+    }
+    .media-box .download-link:hover { text-decoration: underline; }
+
+    /* ---- responsive ---- */
+    @media (max-width: 720px) {
+      .detail-hero { padding: 36px 20px; }
+      .glass { padding: 22px 18px; border-radius: 20px; }
+      .arch-flow { flex-direction: column; }
+      .arch-arrow { transform: rotate(90deg); }
+      .module-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ====== Starry sky ====== -->
+  <div class="stars-layer" id="starsLayer" aria-hidden="true"></div>
+  <img class="dragon-bg" src="../images/kali-dragon-bg.png" alt="" aria-hidden="true" />
+  <canvas id="trailCanvas" aria-hidden="true"></canvas>
+
+  <div class="detail-shell">
+
+    <!-- ====== Back ====== -->
+    <div class="back-bar">
+      <a href="../index.html" class="btn btn-secondary">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+        返回主页
+      </a>
+    </div>
+
+    <!-- ====== Hero ====== -->
+    <div class="glass detail-hero">
+      <p class="eyebrow" style="margin-bottom:14px;">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg>
+        数据爬取与线索生成
+      </p>
+      <h1>BBQ / Catering Lead Generation System</h1>
+      <p class="subtitle">
+        一个面向 B2B 商家线索生成的全自动数据管道。组合 Serper 搜索引擎 API、Google Maps 地点解析、Facebook 页面解析，
+        实现关键词生成、搜索结果采集、结构化数据提取、去重过滤与 Supabase 持久化存储的完整闭环。
+      </p>
+      <div class="badge-row">
+        <span class="badge badge--purple">Python 3.11</span>
+        <span class="badge badge--cyan">FastAPI</span>
+        <span class="badge badge--pink">Supabase / PostgreSQL</span>
+        <span class="badge badge--gold">Serper API</span>
+        <span class="badge badge--purple">APScheduler</span>
+        <span class="badge badge--cyan">BeautifulSoup</span>
+        <span class="badge badge--pink">Docker</span>
+        <span class="badge badge--gold">httpx</span>
+      </div>
+    </div>
+
+    <!-- ====== Architecture ====== -->
+    <div class="glass">
+      <h3 class="sec-title">
+        <span class="sec-icon icon--purple">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#7B4FBF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+        </span>
+        系统架构
+      </h3>
+      <div class="arch-flow">
+        <div class="arch-node arch-node--gold">关键词生成<br><small>keyword_generator</small></div>
+        <span class="arch-arrow">&#10132;</span>
+        <div class="arch-node arch-node--purple">Serper 搜索<br><small>search + places</small></div>
+        <span class="arch-arrow">&#10132;</span>
+        <div class="arch-node arch-node--cyan">来源分类<br><small>Facebook / Maps</small></div>
+        <span class="arch-arrow">&#10132;</span>
+        <div class="arch-node arch-node--pink">页面解析<br><small>HTML 数据提取</small></div>
+        <span class="arch-arrow">&#10132;</span>
+        <div class="arch-node arch-node--gold">去重过滤<br><small>phone / website</small></div>
+        <span class="arch-arrow">&#10132;</span>
+        <div class="arch-node arch-node--purple">Supabase<br><small>Postgres 存储</small></div>
+      </div>
+      <p style="color:var(--text-mid);font-size:0.88rem;text-align:center;margin-top:6px;">
+        每周日 02:00 (UTC) 由 APScheduler 自动触发，也可通过 <code style="background:rgba(168,124,219,0.12);padding:2px 6px;border-radius:4px;font-size:0.85em;color:var(--accent-purple);">POST /pipeline/run</code> 手动执行
+      </p>
+    </div>
+
+    <!-- ====== Pipeline Steps ====== -->
+    <div class="glass">
+      <h3 class="sec-title">
+        <span class="sec-icon icon--pink">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#C4587A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+        </span>
+        Pipeline 执行流程
+      </h3>
+      <div class="pipeline-steps">
+        <div class="p-step">
+          <div class="p-step-num">1</div>
+          <div class="p-step-body">
+            <h4>关键词生成</h4>
+            <p>基于配置的基础关键词（bbq catering, bbq restaurant, smokehouse restaurant 等）与目标地区（Texas, California, UK, Australia 等），组合生成搜索关键词列表，自动去重。</p>
+          </div>
+        </div>
+        <div class="p-step">
+          <div class="p-step-num">2</div>
+          <div class="p-step-body">
+            <h4>Serper API 搜索</h4>
+            <p>对每个关键词调用 Serper Google Search API 获取自然搜索结果，同时调用 Serper Places API 获取 Google Maps 地点数据，过滤出 Facebook 和 Google Maps 链接。</p>
+          </div>
+        </div>
+        <div class="p-step">
+          <div class="p-step-num">3</div>
+          <div class="p-step-body">
+            <h4>Google Maps 页面解析</h4>
+            <p>访问 Google Maps 链接，使用 BeautifulSoup 解析 HTML，提取商家名称、评分、电话、网站、地址。若找到网站则进一步访问 contact 页面补充邮箱和社交媒体链接。</p>
+          </div>
+        </div>
+        <div class="p-step">
+          <div class="p-step-num">4</div>
+          <div class="p-step-body">
+            <h4>Facebook 页面解析</h4>
+            <p>将 Facebook URL 标准化为 mbasic 版本以获取更好解析效果，提取 og:title 作为商家名称，从页面文本中用正则提取邮箱、电话和外站链接。</p>
+          </div>
+        </div>
+        <div class="p-step">
+          <div class="p-step-num">5</div>
+          <div class="p-step-body">
+            <h4>Website Enrichment</h4>
+            <p>对从 Maps 获取到的网站 URL，自动访问主页和 /contact、/contact-us 页面，补充提取邮箱、电话、Facebook/Instagram 链接，丰富线索数据。</p>
+          </div>
+        </div>
+        <div class="p-step">
+          <div class="p-step-num">6</div>
+          <div class="p-step-body">
+            <h4>去重与入库</h4>
+            <p>先进行内存级去重（基于 phone/website），再对 Supabase 已有数据查重，最终将唯一线索写入 leads 表。返回执行摘要（耗时、各阶段数量统计）。</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ====== Project Structure ====== -->
+    <div class="glass">
+      <h3 class="sec-title">
+        <span class="sec-icon icon--cyan">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#3A8BAD" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+        </span>
+        项目结构
+      </h3>
+      <div class="file-tree">
+<span class="dir">facebook_auto_getcustomer/</span>
+├── <span class="file">Dockerfile</span>              <span class="comment"># Python 3.11-slim 容器镜像</span>
+├── <span class="file">docker-compose.yml</span>      <span class="comment"># 一键部署配置</span>
+├── <span class="file">requirements.txt</span>        <span class="comment"># 依赖清单</span>
+├── <span class="file">schema.sql</span>              <span class="comment"># Supabase 建表 SQL</span>
+├── <span class="file">README.md</span>
+├── <span class="dir">app/</span>
+│   ├── <span class="file">main.py</span>             <span class="comment"># FastAPI 入口 — 路由 & lifespan</span>
+│   ├── <span class="file">config.py</span>           <span class="comment"># pydantic-settings 配置</span>
+│   ├── <span class="file">database.py</span>         <span class="comment"># Supabase 客户端 & LeadRepository</span>
+│   ├── <span class="dir">models/</span>
+│   │   └── <span class="file">lead.py</span>         <span class="comment"># Pydantic Lead 数据模型</span>
+│   ├── <span class="dir">services/</span>
+│   │   ├── <span class="file">serper_service.py</span>    <span class="comment"># Serper search + places API</span>
+│   │   ├── <span class="file">lead_extractor.py</span>    <span class="comment"># 统一线索提取入口</span>
+│   │   ├── <span class="file">facebook_parser.py</span>   <span class="comment"># Facebook 页面解析</span>
+│   │   ├── <span class="file">maps_parser.py</span>       <span class="comment"># Google Maps 页面解析</span>
+│   │   └── <span class="file">website_enricher.py</span>  <span class="comment"># 网站信息补充</span>
+│   ├── <span class="dir">pipelines/</span>
+│   │   └── <span class="file">weekly_pipeline.py</span>  <span class="comment"># 周定时管道主逻辑</span>
+│   └── <span class="dir">utils/</span>
+│       ├── <span class="file">keyword_generator.py</span> <span class="comment"># 关键词组合生成</span>
+│       ├── <span class="file">deduplication.py</span>     <span class="comment"># 内存级去重</span>
+│       ├── <span class="file">scheduler.py</span>         <span class="comment"># APScheduler 封装</span>
+│       └── <span class="file">logging.py</span>           <span class="comment"># 日志配置</span>
+└── <span class="dir">scripts/</span>
+    └── <span class="file">run_pipeline.py</span>     <span class="comment"># 手动触发管道脚本</span>
+      </div>
+    </div>
+
+    <!-- ====== Core Modules ====== -->
+    <div class="glass">
+      <h3 class="sec-title">
+        <span class="sec-icon icon--purple">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#7B4FBF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg>
+        </span>
+        核心模块说明
+      </h3>
+      <div class="module-grid">
+        <div class="mod-card">
+          <h4>SerperService</h4>
+          <span class="mod-path">app/services/serper_service.py</span>
+          <p>封装 Serper.dev 的 Search 和 Places 两个 API 端点。Search 获取自然搜索结果并过滤出 Facebook / Google Maps 链接；Places 直接获取 Google Maps 商家数据（名称、电话、网站、地址）。</p>
+        </div>
+        <div class="mod-card">
+          <h4>FacebookParser</h4>
+          <span class="mod-path">app/services/facebook_parser.py</span>
+          <p>将 Facebook URL 标准化为 mbasic 版本提高解析率。通过 og:title 提取商家名称，使用正则从页面文本中提取邮箱、电话，遍历链接标签寻找外站 URL。</p>
+        </div>
+        <div class="mod-card">
+          <h4>GoogleMapsParser</h4>
+          <span class="mod-path">app/services/maps_parser.py</span>
+          <p>解析 Google Maps 页面 HTML，提取商家名称（去除 " - Google Maps" 后缀）、评分、电话号码、网站链接和地址。解析成功后自动调用 WebsiteEnricher 补充数据。</p>
+        </div>
+        <div class="mod-card">
+          <h4>WebsiteEnricher</h4>
+          <span class="mod-path">app/services/website_enricher.py</span>
+          <p>访问商家网站主页及 /contact、/contact-us 页面，用正则补充提取邮箱和电话，遍历社交链接获取 Facebook / Instagram 地址。</p>
+        </div>
+        <div class="mod-card">
+          <h4>WeeklyLeadPipeline</h4>
+          <span class="mod-path">app/pipelines/weekly_pipeline.py</span>
+          <p>管道主编排逻辑：关键词生成 → Serper 搜索 → 多源解析 → 内存去重 → Supabase 查重 → 入库。每步记录统计数据，返回完整执行摘要。</p>
+        </div>
+        <div class="mod-card">
+          <h4>LeadRepository</h4>
+          <span class="mod-path">app/database.py</span>
+          <p>Supabase 数据访问层，封装 list_leads（支持 city/source 筛选分页）、get_stats（按 source 分组统计）、exists_by_phone_or_website（去重查询）、insert_lead（写入）。</p>
+        </div>
+        <div class="mod-card">
+          <h4>KeywordGenerator</h4>
+          <span class="mod-path">app/utils/keyword_generator.py</span>
+          <p>将基础关键词（如 bbq catering）与地区（Texas, UK 等）交叉组合，自动归一化去重后输出搜索关键词列表。</p>
+        </div>
+        <div class="mod-card">
+          <h4>Deduplication</h4>
+          <span class="mod-path">app/utils/deduplication.py</span>
+          <p>内存级去重：遍历线索列表，若两条线索的 phone 或 website 相同则视为重复，仅保留首条。</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ====== Data Model ====== -->
+    <div class="glass">
+      <h3 class="sec-title">
+        <span class="sec-icon icon--gold">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#B8860B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg>
+        </span>
+        数据模型 (Lead)
+      </h3>
+      <p style="color:var(--text-mid);font-size:0.9rem;margin-bottom:16px;">Pydantic 模型定义 + Supabase leads 表结构，支持 UUID 主键自动生成的完整商家线索数据。</p>
+
+      <div class="code-block"><span class="kw">class</span> <span class="fn">Lead</span>(BaseModel):
+    id: UUID | <span class="kw">None</span> = <span class="kw">None</span>
+    business_name: <span class="fn">str</span>              <span class="cm"># 商家名称（必填）</span>
+    category: <span class="fn">str</span> | <span class="kw">None</span>           <span class="cm"># 搜索关键词类别</span>
+    city: <span class="fn">str</span> | <span class="kw">None</span>              <span class="cm"># 城市</span>
+    country: <span class="fn">str</span> | <span class="kw">None</span>           <span class="cm"># 国家</span>
+    address: <span class="fn">str</span> | <span class="kw">None</span>           <span class="cm"># 完整地址</span>
+    phone: <span class="fn">str</span> | <span class="kw">None</span>             <span class="cm"># 电话号码</span>
+    email: <span class="fn">str</span> | <span class="kw">None</span>             <span class="cm"># 邮箱</span>
+    website: <span class="fn">str</span> | <span class="kw">None</span>           <span class="cm"># 官网 URL</span>
+    facebook: <span class="fn">str</span> | <span class="kw">None</span>          <span class="cm"># Facebook 页面 URL</span>
+    instagram: <span class="fn">str</span> | <span class="kw">None</span>         <span class="cm"># Instagram URL</span>
+    source: <span class="fn">str</span>                    <span class="cm"># 来源 (facebook / google_maps)</span>
+    created_at: datetime | <span class="kw">None</span>   <span class="cm"># 创建时间</span></div>
+
+      <div style="margin-top:20px;">
+        <h4 style="font-size:0.95rem;color:var(--text-dark);margin-bottom:10px;">Supabase 建表 SQL</h4>
+        <div class="code-block"><span class="kw">CREATE EXTENSION IF NOT EXISTS</span> <span class="str">"pgcrypto"</span>;
+
+<span class="kw">CREATE TABLE IF NOT EXISTS</span> public.leads (
+  id           uuid        <span class="fn">PRIMARY KEY DEFAULT gen_random_uuid()</span>,
+  business_name text       <span class="kw">NOT NULL</span>,
+  category      text,
+  city          text,
+  country       text,
+  address       text,
+  phone         text,
+  email         text,
+  website       text,
+  facebook      text,
+  instagram     text,
+  source        text       <span class="kw">NOT NULL</span>,
+  created_at    timestamptz <span class="kw">NOT NULL DEFAULT now()</span>
+);
+
+<span class="cm">-- 唯一索引：基于电话号码去重</span>
+<span class="kw">CREATE UNIQUE INDEX IF NOT EXISTS</span> leads_unique_phone
+  <span class="kw">ON</span> public.leads (phone) <span class="kw">WHERE</span> phone <span class="kw">IS NOT NULL AND</span> phone &lt;&gt; <span class="str">''</span>;
+
+<span class="cm">-- 唯一索引：基于网站去重</span>
+<span class="kw">CREATE UNIQUE INDEX IF NOT EXISTS</span> leads_unique_website
+  <span class="kw">ON</span> public.leads (website) <span class="kw">WHERE</span> website <span class="kw">IS NOT NULL AND</span> website &lt;&gt; <span class="str">''</span>;</div>
+      </div>
+    </div>
+
+    <!-- ====== API Endpoints ====== -->
+    <div class="glass">
+      <h3 class="sec-title">
+        <span class="sec-icon icon--cyan">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#3A8BAD" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+        </span>
+        API 接口
+      </h3>
+      <div style="overflow-x:auto;">
+        <table class="api-table">
+          <thead>
+            <tr><th>方法</th><th>路径</th><th>说明</th><th>参数</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><span class="method-get">GET</span></td>
+              <td><code>/leads</code></td>
+              <td>获取线索列表，支持筛选和分页</td>
+              <td><code>city</code> (模糊匹配), <code>source</code>, <code>limit</code> (1~1000, 默认200), <code>offset</code></td>
+            </tr>
+            <tr>
+              <td><span class="method-get">GET</span></td>
+              <td><code>/stats</code></td>
+              <td>获取统计信息：总线索数 + 按来源分组计数</td>
+              <td>-</td>
+            </tr>
+            <tr>
+              <td><span class="method-post">POST</span></td>
+              <td><code>/pipeline/run</code></td>
+              <td>手动触发一次管道执行，返回执行摘要</td>
+              <td>-</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div style="margin-top:18px;">
+        <h4 style="font-size:0.9rem;color:var(--text-dark);margin-bottom:10px;">响应示例 — GET /stats</h4>
+        <div class="code-block">{
+  <span class="str">"total"</span>: <span class="num">156</span>,
+  <span class="str">"by_source"</span>: {
+    <span class="str">"google_maps"</span>: <span class="num">98</span>,
+    <span class="str">"facebook"</span>: <span class="num">58</span>
+  }
+}</div>
+      </div>
+      <div style="margin-top:16px;">
+        <h4 style="font-size:0.9rem;color:var(--text-dark);margin-bottom:10px;">响应示例 — POST /pipeline/run</h4>
+        <div class="code-block">{
+  <span class="str">"started_at"</span>:  <span class="str">"2025-03-10T02:00:00+00:00"</span>,
+  <span class="str">"finished_at"</span>: <span class="str">"2025-03-10T02:03:42+00:00"</span>,
+  <span class="str">"duration_seconds"</span>: <span class="num">222.3</span>,
+  <span class="str">"keywords"</span>:             <span class="num">102</span>,
+  <span class="str">"serper_results_total"</span>: <span class="num">1840</span>,
+  <span class="str">"extracted"</span>:            <span class="num">312</span>,
+  <span class="str">"inserted"</span>:             <span class="num">287</span>,
+  <span class="str">"skipped_duplicates"</span>:   <span class="num">25</span>
+}</div>
+      </div>
+    </div>
+
+    <!-- ====== Environment Variables ====== -->
+    <div class="glass">
+      <h3 class="sec-title">
+        <span class="sec-icon icon--gold">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#B8860B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+        </span>
+        环境变量配置
+      </h3>
+      <div style="overflow-x:auto;">
+        <table class="env-table">
+          <thead>
+            <tr><th>变量名</th><th>默认值</th><th>说明</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code>SERPER_API_KEY</code><span class="env-required">必填</span></td>
+              <td>-</td>
+              <td>Serper.dev API 密钥，用于 Google Search 和 Places 搜索</td>
+            </tr>
+            <tr>
+              <td><code>SUPABASE_URL</code><span class="env-required">必填</span></td>
+              <td>-</td>
+              <td>Supabase 项目 URL</td>
+            </tr>
+            <tr>
+              <td><code>SUPABASE_KEY</code><span class="env-required">必填</span></td>
+              <td>-</td>
+              <td>Supabase Service Role Key（推荐服务端写入使用）</td>
+            </tr>
+            <tr>
+              <td><code>PIPELINE_ENABLED</code><span class="env-optional">可选</span></td>
+              <td><code>true</code></td>
+              <td>是否启用定时管道</td>
+            </tr>
+            <tr>
+              <td><code>PIPELINE_CRON</code><span class="env-optional">可选</span></td>
+              <td><code>0 2 * * 0</code></td>
+              <td>Cron 表达式，默认每周日 02:00 UTC 执行</td>
+            </tr>
+            <tr>
+              <td><code>LOG_LEVEL</code><span class="env-optional">可选</span></td>
+              <td><code>INFO</code></td>
+              <td>日志级别</td>
+            </tr>
+            <tr>
+              <td><code>HTTP_TIMEOUT_SECONDS</code><span class="env-optional">可选</span></td>
+              <td><code>30</code></td>
+              <td>HTTP 请求超时时间（秒）</td>
+            </tr>
+            <tr>
+              <td><code>SERPER_RESULTS_LIMIT</code><span class="env-optional">可选</span></td>
+              <td><code>20</code></td>
+              <td>每次 Serper 搜索返回结果数上限</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ====== Deployment ====== -->
+    <div class="glass">
+      <h3 class="sec-title">
+        <span class="sec-icon icon--pink">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#C4587A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 14.899A7 7 0 1 1 15.71 8h1.79a4.5 4.5 0 0 1 2.5 8.242"/><polyline points="12 12 12 21"/><polyline points="8 17 12 21 16 17"/></svg>
+        </span>
+        部署指南
+      </h3>
+
+      <h4 style="font-size:0.95rem;color:var(--text-dark);margin-bottom:12px;">本地运行</h4>
+      <div class="code-block"><span class="cm"># 1. 创建虚拟环境</span>
+python -m venv .venv
+source .venv/bin/activate   <span class="cm"># Windows: .venv\Scripts\activate</span>
+
+<span class="cm"># 2. 安装依赖</span>
+pip install -r requirements.txt
+
+<span class="cm"># 3. 配置 .env 文件</span>
+<span class="cm"># SERPER_API_KEY=your_key</span>
+<span class="cm"># SUPABASE_URL=https://xxx.supabase.co</span>
+<span class="cm"># SUPABASE_KEY=your_service_role_key</span>
+
+<span class="cm"># 4. 在 Supabase SQL Editor 执行 schema.sql 建表</span>
+
+<span class="cm"># 5. 启动 FastAPI 服务</span>
+uvicorn app.main:app --reload --port <span class="num">8000</span>
+
+<span class="cm"># 6. 手动触发一次管道（可选）</span>
+python scripts/run_pipeline.py</div>
+
+      <h4 style="font-size:0.95rem;color:var(--text-dark);margin:20px 0 12px;">Docker 部署</h4>
+      <div class="code-block"><span class="cm"># 构建镜像</span>
+docker build -t bbq-leadgen .
+
+<span class="cm"># 运行容器</span>
+docker run --rm -p <span class="num">8000</span>:<span class="num">8000</span> \
+  -e SERPER_API_KEY=your_key \
+  -e SUPABASE_URL=https://xxx.supabase.co \
+  -e SUPABASE_KEY=your_service_role_key \
+  bbq-leadgen</div>
+
+      <h4 style="font-size:0.95rem;color:var(--text-dark);margin:20px 0 12px;">Docker Compose（推荐）</h4>
+      <div class="code-block"><span class="cm"># 设置环境变量后一键启动</span>
+SERPER_API_KEY=... SUPABASE_URL=... SUPABASE_KEY=... docker compose up --build</div>
+
+      <div style="margin-top:16px;padding:16px 20px;border-radius:14px;background:rgba(245,197,106,0.12);border:1px solid rgba(245,197,106,0.25);">
+        <p style="margin:0;font-size:0.88rem;color:#8B6914;">
+          <strong>依赖清单：</strong>fastapi, uvicorn, pydantic, pydantic-settings, httpx, beautifulsoup4, lxml, APScheduler, supabase, python-dateutil, pandas
+        </p>
+      </div>
+    </div>
+
+    <!-- ====== Demo Media ====== -->
+    <div class="glass">
+      <h3 class="sec-title">
+        <span class="sec-icon icon--cyan">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#3A8BAD" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/></svg>
+        </span>
+        演示视频
+      </h3>
+      <p style="color:var(--text-mid);font-size:0.9rem;margin-bottom:14px;">
+        FastAPI + Uvicorn 与 Supabase 连接教程，演示如何配置和运行整个线索生成管道。
+      </p>
+      <div class="media-box">
+        <video controls preload="metadata" poster="">
+          <source src="../docs/media/project-a/fast%20uvicore与supabase连接教程（对应工程facebook商家爬取）.mp4" type="video/mp4">
+          您的浏览器不支持 video 标签。
+        </video>
+        <br>
+        <a class="download-link" href="../docs/media/project-a/fast%20uvicore与supabase连接教程（对应工程facebook商家爬取）.mp4" download>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          下载演示视频
+        </a>
+      </div>
+    </div>
+
+    <!-- ====== Footer ====== -->
+    <footer class="footer" style="text-align:center;">
+      <p>
+        <a href="../index.html" class="btn btn-secondary" style="min-width:120px;">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+          返回主页
+        </a>
+      </p>
+      <p style="margin-top:16px;">Made with <span class="footer-heart">&#9829;</span> — Powered by GitHub Pages</p>
+    </footer>
+
+  </div>
+
+  <!-- ====== Mascot ====== -->
+  <div class="mascot-wrapper" id="mascot" aria-hidden="true">
+    <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+      <ellipse cx="100" cy="135" rx="55" ry="45" fill="#C9A7EB"/>
+      <ellipse cx="100" cy="135" rx="55" ry="45" fill="url(#bodyGrad2)" opacity="0.5"/>
+      <ellipse cx="100" cy="145" rx="35" ry="28" fill="#EDD9F7"/>
+      <circle cx="100" cy="80" r="45" fill="#D4B5F0"/>
+      <circle cx="100" cy="80" r="45" fill="url(#headGrad2)" opacity="0.4"/>
+      <path d="M68 50 Q60 20 75 40" stroke="#A87CDB" stroke-width="5" fill="none" stroke-linecap="round"/>
+      <path d="M132 50 Q140 20 125 40" stroke="#A87CDB" stroke-width="5" fill="none" stroke-linecap="round"/>
+      <ellipse cx="62" cy="65" rx="12" ry="18" fill="#C9A7EB" transform="rotate(-20 62 65)"/>
+      <ellipse cx="138" cy="65" rx="12" ry="18" fill="#C9A7EB" transform="rotate(20 138 65)"/>
+      <ellipse cx="62" cy="65" rx="8" ry="12" fill="#EDD9F7" transform="rotate(-20 62 65)"/>
+      <ellipse cx="138" cy="65" rx="8" ry="12" fill="#EDD9F7" transform="rotate(20 138 65)"/>
+      <ellipse cx="82" cy="78" rx="15" ry="16" fill="white"/>
+      <ellipse cx="118" cy="78" rx="15" ry="16" fill="white"/>
+      <circle id="pupilL" cx="82" cy="80" r="8" fill="#4A2D73"/>
+      <circle id="pupilR" cx="118" cy="80" r="8" fill="#4A2D73"/>
+      <circle id="shineL" cx="85" cy="76" r="3" fill="white" opacity="0.9"/>
+      <circle id="shineR" cx="121" cy="76" r="3" fill="white" opacity="0.9"/>
+      <ellipse cx="68" cy="92" rx="10" ry="6" fill="#F5B8D1" opacity="0.6"/>
+      <ellipse cx="132" cy="92" rx="10" ry="6" fill="#F5B8D1" opacity="0.6"/>
+      <path d="M92 96 Q100 106 108 96" stroke="#7B4FBF" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+      <path d="M45 120 Q20 95 50 105 Q30 80 55 100" fill="#C9A7EB" opacity="0.85"/>
+      <path d="M155 120 Q180 95 150 105 Q170 80 145 100" fill="#C9A7EB" opacity="0.85"/>
+      <path d="M55 160 Q30 175 25 155 Q20 140 35 148" stroke="#C9A7EB" stroke-width="6" fill="none" stroke-linecap="round"/>
+      <ellipse cx="78" cy="175" rx="16" ry="8" fill="#B896DA"/>
+      <ellipse cx="122" cy="175" rx="16" ry="8" fill="#B896DA"/>
+      <defs>
+        <radialGradient id="bodyGrad2" cx="50%" cy="30%" r="70%">
+          <stop offset="0%" stop-color="#E8D5F5" stop-opacity="0.6"/>
+          <stop offset="100%" stop-color="#C9A7EB" stop-opacity="0"/>
+        </radialGradient>
+        <radialGradient id="headGrad2" cx="40%" cy="30%" r="65%">
+          <stop offset="0%" stop-color="#F0E4FA" stop-opacity="0.7"/>
+          <stop offset="100%" stop-color="#D4B5F0" stop-opacity="0"/>
+        </radialGradient>
+      </defs>
+    </svg>
+  </div>
+
+  <!-- ====== Shared scripts (stars + trail + eyes + scroll reveal) ====== -->
+  <script>
+  (function() {
+    "use strict";
+
+    /* Stars */
+    var starsLayer = document.getElementById("starsLayer");
+    var starColors = ["", "star--pink", "star--purple", "star--cyan", "star--gold"];
+    for (var i = 0; i < 80; i++) {
+      var s = document.createElement("div");
+      s.className = "star " + starColors[Math.floor(Math.random() * starColors.length)];
+      var size = Math.random() * 4 + 1.5;
+      s.style.cssText = "width:"+size+"px;height:"+size+"px;top:"+Math.random()*100+"%;left:"+Math.random()*100+"%;--dur:"+(Math.random()*3+2)+"s;--delay:"+(Math.random()*5)+"s;";
+      starsLayer.appendChild(s);
+    }
+
+    /* Mouse trail */
+    var canvas = document.getElementById("trailCanvas");
+    var ctx = canvas.getContext("2d");
+    var W, H;
+    function resize() { W = canvas.width = window.innerWidth; H = canvas.height = window.innerHeight; }
+    resize(); window.addEventListener("resize", resize);
+    var particles = [];
+    var trailColors = ["#A87CDB","#F2A7C3","#7EC8E3","#F5C56A","#D4B5F0","#FFD1DC","#B5E8D5","#FFB88C"];
+    var mouseX=-100, mouseY=-100, lastX=-100, lastY=-100, trailActive=false;
+    document.addEventListener("mousemove", function(e){ mouseX=e.clientX; mouseY=e.clientY; trailActive=true; });
+    document.addEventListener("mouseleave", function(){ trailActive=false; });
+
+    function drawStar(cx,cy,r,rot) {
+      ctx.save(); ctx.translate(cx,cy); ctx.rotate(rot); ctx.beginPath();
+      for(var i=0;i<5;i++){var a=(i*4*Math.PI)/5-Math.PI/2;var x=Math.cos(a)*r;var y=Math.sin(a)*r;i===0?ctx.moveTo(x,y):ctx.lineTo(x,y);}
+      ctx.closePath(); ctx.restore();
+    }
+    function animateTrail() {
+      ctx.clearRect(0,0,W,H);
+      if(trailActive){
+        var dx=mouseX-lastX,dy=mouseY-lastY,dist=Math.sqrt(dx*dx+dy*dy);
+        var count=Math.min(Math.floor(dist/3)+1,5);
+        for(var i=0;i<count;i++){var t=i/count;
+          particles.push({x:lastX+dx*t+(Math.random()-0.5)*8,y:lastY+dy*t+(Math.random()-0.5)*8,
+            vx:(Math.random()-0.5)*2.5,vy:(Math.random()-0.5)*2.5+0.5,
+            size:Math.random()*6+3,color:trailColors[Math.floor(Math.random()*trailColors.length)],
+            alpha:1,decay:Math.random()*0.015+0.012,rotation:Math.random()*Math.PI*2,
+            rotSpeed:(Math.random()-0.5)*0.15,shape:Math.random()>0.5?"circle":"star"});
+        }
+        lastX=mouseX;lastY=mouseY;
+      }
+      for(var i=particles.length-1;i>=0;i--){
+        var p=particles[i];p.x+=p.vx;p.y+=p.vy;p.vy+=0.03;p.alpha-=p.decay;p.size*=0.985;p.rotation+=p.rotSpeed;
+        if(p.alpha<=0||p.size<0.5){particles.splice(i,1);continue;}
+        ctx.save();ctx.globalAlpha=p.alpha;ctx.fillStyle=p.color;ctx.shadowColor=p.color;ctx.shadowBlur=8;
+        if(p.shape==="star"){drawStar(p.x,p.y,p.size,p.rotation);ctx.fill();}
+        else{ctx.beginPath();ctx.arc(p.x,p.y,p.size,0,Math.PI*2);ctx.fill();}
+        ctx.restore();
+      }
+      if(particles.length>400)particles.splice(0,particles.length-400);
+      requestAnimationFrame(animateTrail);
+    }
+    animateTrail();
+
+    /* Eye tracking */
+    var mascot=document.getElementById("mascot");
+    var pupilL=document.getElementById("pupilL"),pupilR=document.getElementById("pupilR");
+    var shineL=document.getElementById("shineL"),shineR=document.getElementById("shineR");
+    var eyeL={x:82,y:78},eyeR={x:118,y:78},maxP=6,maxS=4;
+    document.addEventListener("mousemove",function(){
+      var r=mascot.getBoundingClientRect();
+      var cx=r.left+r.width/2,cy=r.top+r.height*0.4;
+      var dx=mouseX-cx,dy=mouseY-cy,d=Math.sqrt(dx*dx+dy*dy)||1;
+      var nx=dx/d,ny=dy/d,sc=Math.min(d/300,1);
+      var px=nx*maxP*sc,py=ny*maxP*sc,sx=nx*maxS*sc,sy=ny*maxS*sc;
+      pupilL.setAttribute("cx",eyeL.x+px);pupilL.setAttribute("cy",eyeL.y+py);
+      pupilR.setAttribute("cx",eyeR.x+px);pupilR.setAttribute("cy",eyeR.y+py);
+      shineL.setAttribute("cx",eyeL.x+px+3+sx*0.3);shineL.setAttribute("cy",eyeL.y+py-4+sy*0.3);
+      shineR.setAttribute("cx",eyeR.x+px+3+sx*0.3);shineR.setAttribute("cy",eyeR.y+py-4+sy*0.3);
+    });
+
+    /* Scroll reveal */
+    var revealEls = document.querySelectorAll(".glass");
+    revealEls.forEach(function(el){el.style.opacity="0";el.style.transform="translateY(20px)";el.style.transition="opacity 0.6s ease, transform 0.6s ease";});
+    var obs = new IntersectionObserver(function(entries){
+      entries.forEach(function(e){if(e.isIntersecting){e.target.style.opacity="1";e.target.style.transform="translateY(0)";obs.unobserve(e.target);}});
+    },{threshold:0.1});
+    revealEls.forEach(function(el){obs.observe(el);});
+  })();
+  </script>
+</body>
+</html>

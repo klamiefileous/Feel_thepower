@@ -1,0 +1,723 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Shopify 批量商品上传系统 | 项目详情</title>
+  <link rel="stylesheet" href="../style.css" />
+  <style>
+    .detail-shell { position:relative; z-index:1; max-width:1020px; margin:0 auto; padding:36px 24px 60px; }
+    .back-bar { margin-bottom:28px; }
+    .glass {
+      border-radius:24px; padding:32px;
+      background:var(--glass-bg); border:1.5px solid var(--glass-border);
+      box-shadow:0 4px 28px var(--glass-shadow), inset 0 1px 0 rgba(255,255,255,0.7);
+      backdrop-filter:blur(18px) saturate(1.2); -webkit-backdrop-filter:blur(18px) saturate(1.2);
+      margin-bottom:28px; position:relative; overflow:hidden;
+    }
+    .glass::before {
+      content:""; position:absolute; top:0; left:0; right:0; height:4px;
+      border-radius:24px 24px 0 0;
+      background:linear-gradient(90deg, var(--accent-purple), var(--accent-pink), var(--accent-cyan));
+    }
+    .detail-hero { padding:52px 36px; text-align:center; }
+    .detail-hero h1 {
+      font-size:clamp(1.8rem,3.5vw,2.8rem);
+      background:linear-gradient(135deg,#7B4FBF,#D4618C,#5B8FD4);
+      -webkit-background-clip:text; -webkit-text-fill-color:transparent;
+      background-clip:text; margin:0 0 14px;
+    }
+    .detail-hero .subtitle { color:var(--text-mid); font-size:1.05rem; max-width:720px; margin:0 auto 22px; }
+    .badge-row { display:flex; flex-wrap:wrap; gap:10px; justify-content:center; }
+    .badge { display:inline-flex; align-items:center; gap:5px; padding:6px 14px; border-radius:999px; font-size:0.78rem; font-weight:600; border:1px solid; }
+    .badge--purple { background:rgba(168,124,219,0.18); color:#7B4FBF; border-color:rgba(168,124,219,0.3); }
+    .badge--pink   { background:rgba(242,167,195,0.18); color:#C4587A; border-color:rgba(242,167,195,0.3); }
+    .badge--cyan   { background:rgba(126,200,227,0.18); color:#3A8BAD; border-color:rgba(126,200,227,0.3); }
+    .badge--gold   { background:rgba(245,197,106,0.18); color:#B8860B; border-color:rgba(245,197,106,0.3); }
+
+    .sec-title { display:flex; align-items:center; gap:10px; margin:0 0 18px; font-size:1.2rem; color:var(--text-dark); }
+    .sec-icon { display:flex; align-items:center; justify-content:center; width:34px; height:34px; border-radius:10px; flex-shrink:0; }
+    .icon--purple { background:linear-gradient(135deg,rgba(168,124,219,0.25),rgba(168,124,219,0.08)); }
+    .icon--pink   { background:linear-gradient(135deg,rgba(242,167,195,0.25),rgba(242,167,195,0.08)); }
+    .icon--cyan   { background:linear-gradient(135deg,rgba(126,200,227,0.25),rgba(126,200,227,0.08)); }
+    .icon--gold   { background:linear-gradient(135deg,rgba(245,197,106,0.25),rgba(245,197,106,0.08)); }
+
+    .arch-flow { display:flex; align-items:center; flex-wrap:wrap; gap:8px; padding:20px 0; justify-content:center; }
+    .arch-node { padding:12px 16px; border-radius:16px; font-size:0.82rem; font-weight:700; text-align:center; min-width:100px; line-height:1.35; }
+    .arch-node--purple { background:rgba(168,124,219,0.2); color:#7B4FBF; border:1.5px solid rgba(168,124,219,0.35); }
+    .arch-node--pink   { background:rgba(242,167,195,0.2); color:#C4587A; border:1.5px solid rgba(242,167,195,0.35); }
+    .arch-node--cyan   { background:rgba(126,200,227,0.2); color:#3A8BAD; border:1.5px solid rgba(126,200,227,0.35); }
+    .arch-node--gold   { background:rgba(245,197,106,0.2); color:#B8860B; border:1.5px solid rgba(245,197,106,0.35); }
+    .arch-arrow { color:var(--text-light); font-size:1.2rem; }
+
+    .file-tree { font-family:"Cascadia Code","Fira Code","Consolas",monospace; font-size:0.82rem; line-height:1.85; color:var(--text-mid); background:rgba(255,255,255,0.45); border-radius:16px; padding:20px 24px; border:1px solid rgba(200,180,230,0.25); }
+    .file-tree .dir { color:var(--accent-purple); font-weight:700; }
+    .file-tree .file { color:var(--text-mid); }
+    .file-tree .comment { color:var(--text-light); font-style:italic; }
+
+    .code-block { font-family:"Cascadia Code","Fira Code","Consolas",monospace; font-size:0.82rem; line-height:1.7; background:rgba(60,40,90,0.92); color:#E8D5F5; border-radius:16px; padding:22px 24px; overflow-x:auto; white-space:pre; position:relative; border:1px solid rgba(168,124,219,0.3); }
+    .code-block .kw  { color:#C9A7EB; }
+    .code-block .str { color:#A8E6CF; }
+    .code-block .fn  { color:#87CEEB; }
+    .code-block .cm  { color:#9A8BB5; }
+    .code-block .num { color:#F5C56A; }
+
+    .csv-table { width:100%; border-collapse:collapse; font-size:0.88rem; }
+    .csv-table th { text-align:left; padding:10px 14px; font-weight:700; background:rgba(168,124,219,0.12); color:var(--text-dark); border-bottom:2px solid rgba(168,124,219,0.2); }
+    .csv-table td { padding:10px 14px; border-bottom:1px solid rgba(200,180,230,0.2); color:var(--text-mid); }
+    .csv-table tr:last-child td { border-bottom:none; }
+    .csv-table code { background:rgba(168,124,219,0.12); padding:2px 8px; border-radius:6px; font-family:monospace; font-size:0.85em; color:var(--accent-purple); }
+
+    .env-table { width:100%; border-collapse:collapse; font-size:0.88rem; }
+    .env-table th { text-align:left; padding:10px 14px; font-weight:700; background:rgba(245,197,106,0.12); color:var(--text-dark); border-bottom:2px solid rgba(245,197,106,0.2); }
+    .env-table td { padding:10px 14px; border-bottom:1px solid rgba(200,180,230,0.15); color:var(--text-mid); }
+    .env-table code { background:rgba(245,197,106,0.15); padding:2px 8px; border-radius:6px; font-family:monospace; font-size:0.85em; color:#B8860B; }
+    .env-required { display:inline-block; padding:1px 8px; border-radius:6px; background:rgba(242,167,195,0.2); color:#C4587A; font-size:0.72rem; font-weight:700; margin-left:6px; }
+    .env-optional { display:inline-block; padding:1px 8px; border-radius:6px; background:rgba(126,200,227,0.15); color:#3A8BAD; font-size:0.72rem; font-weight:700; margin-left:6px; }
+
+    .pipeline-steps { display:grid; gap:14px; margin-top:8px; }
+    .p-step { display:flex; gap:16px; align-items:flex-start; padding:18px 20px; border-radius:16px; background:rgba(255,255,255,0.45); border:1px solid rgba(200,180,230,0.2); transition:transform 0.2s ease, box-shadow 0.2s ease; }
+    .p-step:hover { transform:translateX(4px); box-shadow:0 4px 16px rgba(168,124,219,0.15); }
+    .p-step-num { display:flex; align-items:center; justify-content:center; width:36px; height:36px; border-radius:50%; flex-shrink:0; font-weight:800; font-size:0.9rem; background:linear-gradient(135deg,var(--accent-purple),var(--accent-pink)); color:white; }
+    .p-step-body h4 { margin:0 0 4px; font-size:0.95rem; color:var(--text-dark); }
+    .p-step-body p  { margin:0; font-size:0.88rem; color:var(--text-mid); }
+
+    .module-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:14px; margin-top:8px; }
+    .mod-card { padding:20px; border-radius:18px; background:rgba(255,255,255,0.5); border:1px solid rgba(200,180,230,0.2); transition:transform 0.2s ease, box-shadow 0.2s ease; }
+    .mod-card:hover { transform:translateY(-3px); box-shadow:0 8px 24px rgba(168,124,219,0.18); }
+    .mod-card h4 { margin:0 0 8px; color:var(--text-dark); font-size:0.95rem; }
+    .mod-card .mod-path { font-family:monospace; font-size:0.76rem; color:var(--accent-purple); margin-bottom:8px; display:block; }
+    .mod-card p { margin:0; font-size:0.87rem; color:var(--text-mid); }
+
+    .dual-path { display:grid; grid-template-columns:1fr 1fr; gap:18px; margin-top:14px; }
+    .path-card { padding:22px; border-radius:18px; background:rgba(255,255,255,0.5); border:1px solid rgba(200,180,230,0.2); }
+    .path-card h4 { margin:0 0 10px; font-size:1rem; display:flex; align-items:center; gap:8px; }
+    .path-card .path-tag { display:inline-block; padding:3px 10px; border-radius:8px; font-size:0.72rem; font-weight:700; }
+    .path-tag--a { background:rgba(168,124,219,0.2); color:#7B4FBF; }
+    .path-tag--b { background:rgba(242,167,195,0.2); color:#C4587A; }
+    .path-card p { margin:0 0 8px; font-size:0.87rem; color:var(--text-mid); }
+    .path-card ul { margin:0; padding-left:18px; font-size:0.85rem; color:var(--text-mid); }
+    .path-card li { margin-bottom:4px; }
+
+    @media (max-width:720px) {
+      .detail-hero { padding:36px 20px; }
+      .glass { padding:22px 18px; border-radius:20px; }
+      .arch-flow { flex-direction:column; }
+      .arch-arrow { transform:rotate(90deg); }
+      .module-grid { grid-template-columns:1fr; }
+      .dual-path { grid-template-columns:1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="stars-layer" id="starsLayer" aria-hidden="true"></div>
+  <img class="dragon-bg" src="../images/kali-dragon-bg.png" alt="" aria-hidden="true" />
+  <canvas id="trailCanvas" aria-hidden="true"></canvas>
+
+  <div class="detail-shell">
+
+    <div class="back-bar">
+      <a href="../index.html" class="btn btn-secondary">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+        返回主页
+      </a>
+    </div>
+
+    <!-- ====== Hero ====== -->
+    <div class="glass detail-hero">
+      <p class="eyebrow" style="margin-bottom:14px;">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+        Shopify 自动化上传
+      </p>
+      <h1>Shopify 批量商品上传系统</h1>
+      <p class="subtitle">
+        从竞品分析到 Shopify 一键上架的全自动商品管道。支持两条路径：通过 Playwright 爬取 Amazon 竞品页面提取产品信息，
+        或通过 Serper API 增强 SKU 数据。结合 Ollama 本地 LLM 生成 SEO 优化标题与 HTML 描述，
+        输出标准 Shopify CSV，可直接批量上传数百个商品。
+      </p>
+      <div class="badge-row">
+        <span class="badge badge--purple">Python</span>
+        <span class="badge badge--cyan">Playwright</span>
+        <span class="badge badge--pink">Ollama LLM</span>
+        <span class="badge badge--gold">Serper API</span>
+        <span class="badge badge--purple">Shopify CSV</span>
+        <span class="badge badge--cyan">BeautifulSoup</span>
+        <span class="badge badge--pink">Pandas</span>
+        <span class="badge badge--gold">正则表达式</span>
+      </div>
+    </div>
+
+    <!-- ====== Dual Path Overview ====== -->
+    <div class="glass">
+      <h3 class="sec-title">
+        <span class="sec-icon icon--purple">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#7B4FBF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 3h5v5"/><path d="M8 3H3v5"/><path d="M12 22v-8.3a4 4 0 0 0-1.172-2.872L3 3"/><path d="m15 9 6-6"/></svg>
+        </span>
+        双路径架构
+      </h3>
+      <p style="color:var(--text-mid);font-size:0.9rem;margin-bottom:8px;">
+        系统提供两条互补的商品生成路径，可根据业务场景灵活选择：
+      </p>
+      <div class="dual-path">
+        <div class="path-card">
+          <h4><span class="path-tag path-tag--a">路径 A</span> shopify1.py — 竞品爬取</h4>
+          <p><strong>输入：</strong>competitor_urls.csv（Amazon 等竞品产品页面 URL 列表）</p>
+          <ul>
+            <li>Playwright 打开竞品页面，自动提取产品数据</li>
+            <li>解析标题、价格（正则清洗货币符号）、描述、图片 URL、规格参数</li>
+            <li>Ollama LLM 基于原始数据生成 SEO 优化标题和 HTML 描述</li>
+            <li>输出完整 Shopify CSV（30+ 标准字段）</li>
+          </ul>
+          <p style="margin-top:8px;"><strong>适用场景：</strong>有明确竞品链接，需要对标分析</p>
+        </div>
+        <div class="path-card">
+          <h4><span class="path-tag path-tag--b">路径 B</span> shopify_serper.py — SKU 增强</h4>
+          <p><strong>输入：</strong>products_to_update.csv（SKU / 标题 / 描述 表格）</p>
+          <ul>
+            <li>Serper API 搜索 Google 获取同类产品上下文信息和图片</li>
+            <li>Ollama LLM 进行三级分类（大类→中类→小类）</li>
+            <li>LLM 生成优化标题和带格式的 HTML 描述</li>
+            <li>输出 products_for_shopify.csv（含分类、图片、优化文案）</li>
+          </ul>
+          <p style="margin-top:8px;"><strong>适用场景：</strong>已有 SKU 列表，需要搜索增强和分类</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ====== Architecture Flow (Path A) ====== -->
+    <div class="glass">
+      <h3 class="sec-title">
+        <span class="sec-icon icon--cyan">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#3A8BAD" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+        </span>
+        路径 A 架构 — 竞品爬取流程
+      </h3>
+      <div class="arch-flow">
+        <div class="arch-node arch-node--gold">competitor_urls<br><small>CSV 输入</small></div>
+        <span class="arch-arrow">&#10132;</span>
+        <div class="arch-node arch-node--purple">Playwright<br><small>页面爬取</small></div>
+        <span class="arch-arrow">&#10132;</span>
+        <div class="arch-node arch-node--cyan">BS4 解析<br><small>数据提取</small></div>
+        <span class="arch-arrow">&#10132;</span>
+        <div class="arch-node arch-node--pink">价格清洗<br><small>正则处理</small></div>
+        <span class="arch-arrow">&#10132;</span>
+        <div class="arch-node arch-node--gold">Ollama LLM<br><small>SEO 优化</small></div>
+        <span class="arch-arrow">&#10132;</span>
+        <div class="arch-node arch-node--purple">Shopify CSV<br><small>30+ 字段输出</small></div>
+      </div>
+    </div>
+
+    <!-- ====== Architecture Flow (Path B) ====== -->
+    <div class="glass">
+      <h3 class="sec-title">
+        <span class="sec-icon icon--pink">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#C4587A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        </span>
+        路径 B 架构 — SKU 搜索增强流程
+      </h3>
+      <div class="arch-flow">
+        <div class="arch-node arch-node--pink">SKU 表格<br><small>CSV 输入</small></div>
+        <span class="arch-arrow">&#10132;</span>
+        <div class="arch-node arch-node--cyan">Serper API<br><small>Google 搜索</small></div>
+        <span class="arch-arrow">&#10132;</span>
+        <div class="arch-node arch-node--gold">LLM 分类<br><small>三级类目</small></div>
+        <span class="arch-arrow">&#10132;</span>
+        <div class="arch-node arch-node--purple">LLM 标题<br><small>SEO 生成</small></div>
+        <span class="arch-arrow">&#10132;</span>
+        <div class="arch-node arch-node--pink">LLM 描述<br><small>HTML 生成</small></div>
+        <span class="arch-arrow">&#10132;</span>
+        <div class="arch-node arch-node--cyan">Shopify CSV<br><small>一键导入</small></div>
+      </div>
+    </div>
+
+    <!-- ====== Pipeline Steps (Path A) ====== -->
+    <div class="glass">
+      <h3 class="sec-title">
+        <span class="sec-icon icon--purple">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#7B4FBF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+        </span>
+        路径 A 执行流程 — shopify1.py
+      </h3>
+      <div class="pipeline-steps">
+        <div class="p-step">
+          <div class="p-step-num">1</div>
+          <div class="p-step-body">
+            <h4>读取竞品 URL 列表</h4>
+            <p>从 competitor_urls.csv 中逐行读取 Amazon 产品页面 URL。CSV 格式为单列（每行一个 URL），支持批量输入数十个竞品链接。</p>
+          </div>
+        </div>
+        <div class="p-step">
+          <div class="p-step-num">2</div>
+          <div class="p-step-body">
+            <h4>Playwright 页面爬取 (fetch_product_page)</h4>
+            <p>启动 Chromium 浏览器（headless 模式可配置），访问每个竞品 URL。等待页面加载完成后获取完整 HTML 内容，处理网络超时和反爬拦截。自动等待关键元素渲染以确保动态内容加载。</p>
+          </div>
+        </div>
+        <div class="p-step">
+          <div class="p-step-num">3</div>
+          <div class="p-step-body">
+            <h4>BeautifulSoup 数据提取</h4>
+            <p>使用 BeautifulSoup 解析 HTML，提取：产品标题（#productTitle）、价格（.a-price .a-offscreen，正则 <code style="background:rgba(168,124,219,0.12);padding:2px 6px;border-radius:4px;font-size:0.85em;color:var(--accent-purple);">re.sub(r'[^0-9.]', '', price_text)</code> 清洗货币符号）、产品描述（#productDescription）、图片 URL 列表（从 colorImages JSON 中提取 hiRes 链接）、规格参数表（#productDetails_techSpec_section_1 表格解析为 dict）。</p>
+          </div>
+        </div>
+        <div class="p-step">
+          <div class="p-step-num">4</div>
+          <div class="p-step-body">
+            <h4>Ollama LLM 优化 (llm_optimize)</h4>
+            <p>将提取的原始标题、描述、规格组装为 prompt，调用本地 Ollama（llama3.1:8b）生成：(1) SEO 优化的产品标题（英文，含核心关键词，不超过 200 字符）；(2) 带 HTML 格式的产品描述（含特性列表、规格表格、使用场景）。通过 HTTP POST 请求 <code style="background:rgba(168,124,219,0.12);padding:2px 6px;border-radius:4px;font-size:0.85em;color:var(--accent-purple);">http://localhost:11434/api/generate</code>。</p>
+          </div>
+        </div>
+        <div class="p-step">
+          <div class="p-step-num">5</div>
+          <div class="p-step-body">
+            <h4>生成 Handle 与变体字段</h4>
+            <p>基于优化标题生成 URL-friendly Handle（小写 + 连字符），自动填充 Shopify 所需的全部字段：Vendor（店铺名）、Type（产品类型）、Tags（标签）、Option1/2/3 Name/Value（变体属性如 Size/Color/Material）、Variant SKU、Variant Grams、Variant Inventory 系列字段。</p>
+          </div>
+        </div>
+        <div class="p-step">
+          <div class="p-step-num">6</div>
+          <div class="p-step-body">
+            <h4>输出 Shopify CSV (30+ 字段)</h4>
+            <p>将所有产品数据写入标准 Shopify 导入格式 CSV，包含 Handle、Title、Body (HTML)、Vendor、Product Category、Type、Tags、Published、Option 系列、Variant 系列、Image Src/Position/Alt Text、SEO Title/Description、Google Shopping 分类、Status 等 30+ 列。可直接在 Shopify Admin 后台 Products → Import 一键上传。</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ====== Pipeline Steps (Path B) ====== -->
+    <div class="glass">
+      <h3 class="sec-title">
+        <span class="sec-icon icon--pink">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#C4587A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+        </span>
+        路径 B 执行流程 — shopify_serper.py
+      </h3>
+      <div class="pipeline-steps">
+        <div class="p-step">
+          <div class="p-step-num">1</div>
+          <div class="p-step-body">
+            <h4>读取 SKU 表格</h4>
+            <p>从 products_to_update.csv 读取三列数据：sku（产品编号）、title（原始标题）、description（原始描述）。支持数百行批量处理。</p>
+          </div>
+        </div>
+        <div class="p-step">
+          <div class="p-step-num">2</div>
+          <div class="p-step-body">
+            <h4>Serper Google 搜索 (get_google_context)</h4>
+            <p>用产品标题 + 描述构造搜索查询，调用 Serper API 获取 Google 搜索结果。提取 organic results 前 5 条的标题和摘要作为市场上下文，同时获取 images 前 3 张产品参考图片 URL。</p>
+          </div>
+        </div>
+        <div class="p-step">
+          <div class="p-step-num">3</div>
+          <div class="p-step-body">
+            <h4>LLM 三级分类 (classify_category)</h4>
+            <p>将产品信息 + Google 搜索上下文发送给 Ollama，要求按 Shopify 分类体系进行三级分类：大类（如 Home &amp; Garden）→ 中类（如 Kitchen Storage）→ 小类（如 Food Containers）。返回结构化 JSON。</p>
+          </div>
+        </div>
+        <div class="p-step">
+          <div class="p-step-num">4</div>
+          <div class="p-step-body">
+            <h4>LLM 标题生成 (generate_title)</h4>
+            <p>基于原始标题、描述、搜索上下文和分类结果，LLM 生成符合 Shopify SEO 规范的产品标题：包含核心关键词、材质/尺寸等属性词、控制在 200 字符以内。</p>
+          </div>
+        </div>
+        <div class="p-step">
+          <div class="p-step-num">5</div>
+          <div class="p-step-body">
+            <h4>LLM 描述生成 (generate_description)</h4>
+            <p>LLM 生成带 HTML 格式的产品描述：包含产品特性 &lt;ul&gt; 列表、规格 &lt;table&gt; 表格、使用场景段落。结合搜索上下文确保内容差异化，避免与竞品雷同。</p>
+          </div>
+        </div>
+        <div class="p-step">
+          <div class="p-step-num">6</div>
+          <div class="p-step-body">
+            <h4>输出增强 CSV</h4>
+            <p>写入 products_for_shopify.csv，包含原始 SKU、三级分类、优化后标题、HTML 描述、参考图片 URL 等字段。可进一步转换为 Shopify 标准导入格式。</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ====== Project Structure ====== -->
+    <div class="glass">
+      <h3 class="sec-title">
+        <span class="sec-icon icon--cyan">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#3A8BAD" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+        </span>
+        项目结构
+      </h3>
+      <div class="file-tree">
+<span class="dir">shopify-bulk-upload/</span>
+├── <span class="file">shopify1.py</span>              <span class="comment"># 路径 A — Playwright 竞品爬取 + LLM 优化 + Shopify CSV</span>
+├── <span class="file">shopify_serper.py</span>         <span class="comment"># 路径 B — Serper 搜索增强 + LLM 分类/标题/描述</span>
+├── <span class="file">competitor_urls.csv</span>       <span class="comment"># 路径 A 输入 — 竞品产品页面 URL 列表</span>
+├── <span class="file">products_to_update.csv</span>    <span class="comment"># 路径 B 输入 — SKU/标题/描述 表格</span>
+├── <span class="file">shopify_products.csv</span>      <span class="comment"># 路径 A 输出 — 标准 Shopify 导入 CSV (30+ 列)</span>
+├── <span class="file">products_for_shopify.csv</span>  <span class="comment"># 路径 B 输出 — 增强后的产品数据 CSV</span>
+├── <span class="file">readme.txt</span>                <span class="comment"># 工作流说明文档</span>
+├── <span class="file">两个py脚本的区别.txt</span>      <span class="comment"># 两条路径的对比说明</span>
+└── <span class="file">教程视频.mp4</span>              <span class="comment"># 操作教程录屏</span>
+      </div>
+    </div>
+
+    <!-- ====== Core Modules ====== -->
+    <div class="glass">
+      <h3 class="sec-title">
+        <span class="sec-icon icon--purple">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#7B4FBF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg>
+        </span>
+        核心函数说明
+      </h3>
+      <div class="module-grid">
+        <div class="mod-card">
+          <h4>fetch_product_page()</h4>
+          <span class="mod-path">shopify1.py</span>
+          <p>Playwright 异步函数，启动 Chromium 访问竞品页面，等待动态内容加载后返回完整 HTML。支持 headless 模式切换和超时配置。</p>
+        </div>
+        <div class="mod-card">
+          <h4>数据解析与提取</h4>
+          <span class="mod-path">shopify1.py</span>
+          <p>BeautifulSoup 解析 Amazon 页面：提取 #productTitle、.a-price（正则清洗 <code style="font-size:0.85em;">[^0-9.]</code> 保留数字）、#productDescription、colorImages JSON 中的 hiRes 图片、#productDetails 规格表格。</p>
+        </div>
+        <div class="mod-card">
+          <h4>ollama_call()</h4>
+          <span class="mod-path">shopify1.py</span>
+          <p>封装 Ollama REST API 调用（<code style="font-size:0.85em;">POST /api/generate</code>），使用 llama3.1:8b 模型，设置 temperature=0.7 保证创意性与稳定性平衡。返回生成的文本内容。</p>
+        </div>
+        <div class="mod-card">
+          <h4>llm_optimize()</h4>
+          <span class="mod-path">shopify1.py</span>
+          <p>构造 prompt 将产品原始数据发送给 LLM，要求输出 JSON 格式包含 optimized_title 和 html_description。解析 JSON 响应，处理格式异常并兜底回退到原始数据。</p>
+        </div>
+        <div class="mod-card">
+          <h4>get_google_context()</h4>
+          <span class="mod-path">shopify_serper.py</span>
+          <p>调用 Serper API（<code style="font-size:0.85em;">POST google.serper.dev/search</code>），获取 Google 搜索结果前 5 条 organic 数据和前 3 张产品图片，为 LLM 提供市场参考上下文。</p>
+        </div>
+        <div class="mod-card">
+          <h4>llm_call()</h4>
+          <span class="mod-path">shopify_serper.py</span>
+          <p>统一的 Ollama 调用封装层，接受 prompt 和 max_tokens 参数。在 shopify_serper.py 中被分类、标题生成、描述生成三个步骤复用。</p>
+        </div>
+        <div class="mod-card">
+          <h4>classify_category()</h4>
+          <span class="mod-path">shopify_serper.py</span>
+          <p>三级产品分类：将产品信息 + 搜索上下文发送给 LLM，要求按 Shopify 产品分类体系返回大类/中类/小类。JSON 结构化输出并做基础校验。</p>
+        </div>
+        <div class="mod-card">
+          <h4>process_urls_from_csv() / process_products_from_csv()</h4>
+          <span class="mod-path">shopify1.py / shopify_serper.py</span>
+          <p>各自的主流程函数：读取输入 CSV → 逐行处理（爬取/搜索 + LLM 优化）→ 收集结果 → 写入输出 CSV。包含进度打印、错误跳过、异常兜底。</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ====== Shopify CSV Format ====== -->
+    <div class="glass">
+      <h3 class="sec-title">
+        <span class="sec-icon icon--gold">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#B8860B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+        </span>
+        Shopify CSV 标准字段 (30+ 列)
+      </h3>
+      <p style="color:var(--text-mid);font-size:0.88rem;margin-bottom:14px;">
+        shopify1.py 输出完整的 Shopify 产品导入 CSV，以下是核心字段说明：
+      </p>
+      <div style="overflow-x:auto;">
+        <table class="csv-table">
+          <thead><tr><th>字段名</th><th>说明</th><th>来源</th></tr></thead>
+          <tbody>
+            <tr><td><code>Handle</code></td><td>URL 友好的唯一标识符（小写+连字符）</td><td>自动从标题生成</td></tr>
+            <tr><td><code>Title</code></td><td>LLM 优化后的 SEO 标题（≤200 字符）</td><td>Ollama 生成</td></tr>
+            <tr><td><code>Body (HTML)</code></td><td>带格式的 HTML 产品描述</td><td>Ollama 生成</td></tr>
+            <tr><td><code>Vendor</code></td><td>供应商/品牌名称</td><td>配置项</td></tr>
+            <tr><td><code>Product Category</code></td><td>Shopify 产品分类</td><td>LLM 分类或手动</td></tr>
+            <tr><td><code>Type</code></td><td>产品类型标签</td><td>从竞品数据推断</td></tr>
+            <tr><td><code>Tags</code></td><td>逗号分隔的搜索标签</td><td>LLM 提取关键词</td></tr>
+            <tr><td><code>Published</code></td><td>是否立即发布（TRUE/FALSE）</td><td>默认 TRUE</td></tr>
+            <tr><td><code>Option1/2/3 Name</code></td><td>变体属性名称（如 Size, Color, Material）</td><td>从规格参数提取</td></tr>
+            <tr><td><code>Option1/2/3 Value</code></td><td>变体属性值</td><td>从规格参数提取</td></tr>
+            <tr><td><code>Variant SKU</code></td><td>变体 SKU 编码</td><td>自动递增生成</td></tr>
+            <tr><td><code>Variant Grams</code></td><td>变体重量（克）</td><td>默认值或爬取</td></tr>
+            <tr><td><code>Variant Inventory Tracker</code></td><td>库存跟踪方式</td><td>默认 shopify</td></tr>
+            <tr><td><code>Variant Inventory Qty</code></td><td>库存数量</td><td>默认 100</td></tr>
+            <tr><td><code>Variant Inventory Policy</code></td><td>缺货策略（deny/continue）</td><td>默认 deny</td></tr>
+            <tr><td><code>Variant Fulfillment Service</code></td><td>发货服务</td><td>默认 manual</td></tr>
+            <tr><td><code>Variant Price</code></td><td>售价（清洗后的纯数字）</td><td>正则提取竞品价格</td></tr>
+            <tr><td><code>Variant Compare At Price</code></td><td>原价/划线价</td><td>自动设为售价 ×1.3</td></tr>
+            <tr><td><code>Variant Requires Shipping</code></td><td>是否需要运费</td><td>默认 TRUE</td></tr>
+            <tr><td><code>Variant Taxable</code></td><td>是否征税</td><td>默认 TRUE</td></tr>
+            <tr><td><code>Image Src</code></td><td>主图 URL</td><td>爬取竞品 hiRes 图片</td></tr>
+            <tr><td><code>Image Position</code></td><td>图片排序位置</td><td>自动递增</td></tr>
+            <tr><td><code>Image Alt Text</code></td><td>图片 ALT 文本</td><td>自动从标题生成</td></tr>
+            <tr><td><code>SEO Title</code></td><td>SEO 页面标题</td><td>同 Title</td></tr>
+            <tr><td><code>SEO Description</code></td><td>SEO 元描述</td><td>LLM 摘要生成</td></tr>
+            <tr><td><code>Google Shopping / Google Product Category</code></td><td>Google 商品分类</td><td>LLM 映射</td></tr>
+            <tr><td><code>Status</code></td><td>产品状态（active/draft）</td><td>默认 active</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ====== LLM Integration ====== -->
+    <div class="glass">
+      <h3 class="sec-title">
+        <span class="sec-icon icon--pink">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#C4587A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a7 7 0 0 1 7 7c0 5.25-7 13-7 13S5 14.25 5 9a7 7 0 0 1 7-7z"/><circle cx="12" cy="9" r="2.5"/></svg>
+        </span>
+        Ollama LLM 集成
+      </h3>
+
+      <h4 style="font-size:0.95rem;color:var(--text-dark);margin-bottom:12px;">调用方式</h4>
+      <div class="code-block"><span class="cm"># shopify1.py — 直接 HTTP 请求</span>
+<span class="kw">import</span> requests
+
+<span class="kw">def</span> <span class="fn">ollama_call</span>(prompt, model=<span class="str">"llama3.1:8b"</span>):
+    response = requests.<span class="fn">post</span>(
+        <span class="str">"http://localhost:11434/api/generate"</span>,
+        json={
+            <span class="str">"model"</span>: model,
+            <span class="str">"prompt"</span>: prompt,
+            <span class="str">"stream"</span>: <span class="kw">False</span>,
+            <span class="str">"options"</span>: {<span class="str">"temperature"</span>: <span class="num">0.7</span>}
+        }
+    )
+    <span class="kw">return</span> response.json()[<span class="str">"response"</span>]</div>
+
+      <h4 style="font-size:0.95rem;color:var(--text-dark);margin:22px 0 12px;">Prompt 工程示例（SEO 标题生成）</h4>
+      <div class="code-block"><span class="cm"># 路径 A — 基于竞品数据的优化 prompt</span>
+prompt = <span class="str">f"""You are an e-commerce SEO expert.
+Given the following product information, generate an optimized
+Shopify product title that:
+- Contains core keywords
+- Includes material/size attributes
+- Is under 200 characters
+- Follows Amazon/Shopify best practices
+
+Original Title: {title}
+Description: {description}
+Specifications: {specs}
+
+Return ONLY a JSON object:
+{{"optimized_title": "...", "html_description": "..."}}
+"""</span></div>
+
+      <h4 style="font-size:0.95rem;color:var(--text-dark);margin:22px 0 12px;">路径 B 的 LLM 调用链</h4>
+      <div class="code-block"><span class="cm"># shopify_serper.py — 三次 LLM 调用/产品</span>
+
+<span class="cm"># 1. 三级分类</span>
+category = <span class="fn">classify_category</span>(title, description, google_context)
+<span class="cm"># → {"level1": "Home & Garden", "level2": "Kitchen", "level3": "Storage"}</span>
+
+<span class="cm"># 2. SEO 标题</span>
+optimized_title = <span class="fn">generate_title</span>(title, description, category, google_context)
+<span class="cm"># → "Premium Aluminum Foil Containers with Lids - 50 Pack..."</span>
+
+<span class="cm"># 3. HTML 描述</span>
+html_desc = <span class="fn">generate_description</span>(title, description, category, google_context)
+<span class="cm"># → "&lt;h3&gt;Features&lt;/h3&gt;&lt;ul&gt;&lt;li&gt;...&lt;/li&gt;&lt;/ul&gt;..."</span></div>
+
+      <div style="margin-top:18px;padding:16px 20px;border-radius:14px;background:rgba(168,124,219,0.1);border:1px solid rgba(168,124,219,0.2);">
+        <p style="margin:0;font-size:0.88rem;color:#5A3D8A;">
+          <strong>本地运行优势：</strong>使用 Ollama + llama3.1:8b 完全本地运行，无需付费 API。每产品 3 次 LLM 调用（分类 + 标题 + 描述），处理数百个商品无额外成本。temperature=0.7 在创意性和稳定性之间取得平衡。
+        </p>
+      </div>
+    </div>
+
+    <!-- ====== Configuration ====== -->
+    <div class="glass">
+      <h3 class="sec-title">
+        <span class="sec-icon icon--gold">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#B8860B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+        </span>
+        配置说明
+      </h3>
+      <div style="overflow-x:auto;">
+        <table class="env-table">
+          <thead><tr><th>配置项</th><th>路径</th><th>说明</th></tr></thead>
+          <tbody>
+            <tr>
+              <td><code>Ollama 地址</code><span class="env-required">必需</span></td>
+              <td>A + B</td>
+              <td>默认 <code>http://localhost:11434</code>，确保 Ollama 已启动并拉取 llama3.1:8b</td>
+            </tr>
+            <tr>
+              <td><code>SERPER_API_KEY</code><span class="env-required">路径B</span></td>
+              <td>B</td>
+              <td>Serper API 密钥（serper.dev 注册获取），用于 Google 搜索</td>
+            </tr>
+            <tr>
+              <td><code>模型名称</code><span class="env-optional">可调</span></td>
+              <td>A + B</td>
+              <td>默认 llama3.1:8b，可替换为 mistral、codellama 等</td>
+            </tr>
+            <tr>
+              <td><code>Headless 模式</code><span class="env-optional">可调</span></td>
+              <td>A</td>
+              <td>Playwright 浏览器是否无头运行（调试时建议关闭以观察）</td>
+            </tr>
+            <tr>
+              <td><code>temperature</code><span class="env-optional">可调</span></td>
+              <td>A + B</td>
+              <td>LLM 温度参数，默认 0.7。降低更稳定，升高更有创意</td>
+            </tr>
+            <tr>
+              <td><code>Vendor 名称</code><span class="env-optional">可调</span></td>
+              <td>A</td>
+              <td>Shopify CSV 中的供应商字段，默认值可在代码中修改</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ====== Deployment ====== -->
+    <div class="glass">
+      <h3 class="sec-title">
+        <span class="sec-icon icon--cyan">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#3A8BAD" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 14.899A7 7 0 1 1 15.71 8h1.79a4.5 4.5 0 0 1 2.5 8.242"/><polyline points="12 12 12 21"/><polyline points="8 17 12 21 16 17"/></svg>
+        </span>
+        部署与使用指南
+      </h3>
+
+      <h4 style="font-size:0.95rem;color:var(--text-dark);margin-bottom:12px;">1. 安装依赖</h4>
+      <div class="code-block">pip install playwright beautifulsoup4 requests pandas
+
+<span class="cm"># 安装 Playwright 浏览器（首次需要）</span>
+playwright install chromium</div>
+
+      <h4 style="font-size:0.95rem;color:var(--text-dark);margin:20px 0 12px;">2. 启动 Ollama</h4>
+      <div class="code-block"><span class="cm"># 确保 Ollama 已安装</span>
+ollama pull llama3.1:8b
+ollama serve
+
+<span class="cm"># 验证 Ollama 是否正常运行</span>
+curl http://localhost:11434/api/tags</div>
+
+      <h4 style="font-size:0.95rem;color:var(--text-dark);margin:20px 0 12px;">3. 准备输入数据</h4>
+      <div class="code-block"><span class="cm"># 路径 A — 创建 competitor_urls.csv</span>
+<span class="cm"># 每行一个 Amazon 产品 URL</span>
+https://www.amazon.com/dp/B0XXXXXXXX
+https://www.amazon.com/dp/B0YYYYYYYY
+
+<span class="cm"># 路径 B — 创建 products_to_update.csv</span>
+<span class="cm"># 包含 sku, title, description 三列</span>
+sku,title,description
+SKU001,Aluminum Foil Container,Pack of 50 disposable containers
+SKU002,Plastic Food Storage Set,BPA free containers with lids</div>
+
+      <h4 style="font-size:0.95rem;color:var(--text-dark);margin:20px 0 12px;">4. 运行脚本</h4>
+      <div class="code-block"><span class="cm"># 路径 A — 竞品爬取 + LLM 优化 + Shopify CSV</span>
+python shopify1.py
+
+<span class="cm"># 路径 B — SKU 搜索增强 + LLM 分类/生成</span>
+python shopify_serper.py</div>
+
+      <h4 style="font-size:0.95rem;color:var(--text-dark);margin:20px 0 12px;">5. 上传到 Shopify</h4>
+      <div class="code-block"><span class="cm"># 1. 登录 Shopify Admin 后台</span>
+<span class="cm"># 2. 进入 Products → Import</span>
+<span class="cm"># 3. 选择生成的 shopify_products.csv（路径 A）</span>
+<span class="cm">#    或 products_for_shopify.csv（路径 B）</span>
+<span class="cm"># 4. 点击 Upload file → 确认映射 → Import</span>
+<span class="cm"># 5. 数百个商品将自动创建到店铺中</span></div>
+
+      <div style="margin-top:18px;padding:16px 20px;border-radius:14px;background:rgba(245,197,106,0.12);border:1px solid rgba(245,197,106,0.25);">
+        <p style="margin:0;font-size:0.88rem;color:#8B6914;">
+          <strong>依赖清单：</strong>playwright, beautifulsoup4, requests, pandas（路径 A）；额外需 requests（路径 B，serper API 调用）。无 FastAPI/Web 服务器，纯脚本运行。
+        </p>
+      </div>
+
+      <div style="margin-top:12px;padding:16px 20px;border-radius:14px;background:rgba(126,200,227,0.1);border:1px solid rgba(126,200,227,0.2);">
+        <p style="margin:0;font-size:0.88rem;color:#2A6F8F;">
+          <strong>批量处理提示：</strong>shopify1.py 逐 URL 处理，适合 10-50 个竞品分析；shopify_serper.py 批量处理 CSV 所有行，适合 100-500+ 个 SKU 的快速生成。可根据业务规模选择路径。
+        </p>
+      </div>
+
+      <div style="margin-top:12px;padding:16px 20px;border-radius:14px;background:rgba(242,167,195,0.1);border:1px solid rgba(242,167,195,0.2);">
+        <p style="margin:0;font-size:0.88rem;color:#9B4060;">
+          <strong>Amazon 反爬注意：</strong>路径 A 使用 Playwright 真实浏览器访问 Amazon，建议：(1) 控制访问频率避免触发 CAPTCHA；(2) headless=false 方便调试观察；(3) 若被封 IP，可切换代理或等待后重试。
+        </p>
+      </div>
+    </div>
+
+    <!-- ====== Footer ====== -->
+    <footer class="footer" style="text-align:center;">
+      <p>
+        <a href="../index.html" class="btn btn-secondary" style="min-width:120px;">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+          返回主页
+        </a>
+      </p>
+      <p style="margin-top:16px;">Made with <span class="footer-heart">&#9829;</span> — Powered by GitHub Pages</p>
+    </footer>
+
+  </div>
+
+  <!-- ====== Mascot ====== -->
+  <div class="mascot-wrapper" id="mascot" aria-hidden="true">
+    <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+      <ellipse cx="100" cy="135" rx="55" ry="45" fill="#C9A7EB"/>
+      <ellipse cx="100" cy="135" rx="55" ry="45" fill="url(#bodyGrad4)" opacity="0.5"/>
+      <ellipse cx="100" cy="145" rx="35" ry="28" fill="#EDD9F7"/>
+      <circle cx="100" cy="80" r="45" fill="#D4B5F0"/>
+      <circle cx="100" cy="80" r="45" fill="url(#headGrad4)" opacity="0.4"/>
+      <path d="M68 50 Q60 20 75 40" stroke="#A87CDB" stroke-width="5" fill="none" stroke-linecap="round"/>
+      <path d="M132 50 Q140 20 125 40" stroke="#A87CDB" stroke-width="5" fill="none" stroke-linecap="round"/>
+      <ellipse cx="62" cy="65" rx="12" ry="18" fill="#C9A7EB" transform="rotate(-20 62 65)"/>
+      <ellipse cx="138" cy="65" rx="12" ry="18" fill="#C9A7EB" transform="rotate(20 138 65)"/>
+      <ellipse cx="62" cy="65" rx="8" ry="12" fill="#EDD9F7" transform="rotate(-20 62 65)"/>
+      <ellipse cx="138" cy="65" rx="8" ry="12" fill="#EDD9F7" transform="rotate(20 138 65)"/>
+      <ellipse cx="82" cy="78" rx="15" ry="16" fill="white"/>
+      <ellipse cx="118" cy="78" rx="15" ry="16" fill="white"/>
+      <circle id="pupilL" cx="82" cy="80" r="8" fill="#4A2D73"/>
+      <circle id="pupilR" cx="118" cy="80" r="8" fill="#4A2D73"/>
+      <circle id="shineL" cx="85" cy="76" r="3" fill="white" opacity="0.9"/>
+      <circle id="shineR" cx="121" cy="76" r="3" fill="white" opacity="0.9"/>
+      <ellipse cx="68" cy="92" rx="10" ry="6" fill="#F5B8D1" opacity="0.6"/>
+      <ellipse cx="132" cy="92" rx="10" ry="6" fill="#F5B8D1" opacity="0.6"/>
+      <path d="M92 96 Q100 106 108 96" stroke="#7B4FBF" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+      <path d="M45 120 Q20 95 50 105 Q30 80 55 100" fill="#C9A7EB" opacity="0.85"/>
+      <path d="M155 120 Q180 95 150 105 Q170 80 145 100" fill="#C9A7EB" opacity="0.85"/>
+      <path d="M55 160 Q30 175 25 155 Q20 140 35 148" stroke="#C9A7EB" stroke-width="6" fill="none" stroke-linecap="round"/>
+      <ellipse cx="78" cy="175" rx="16" ry="8" fill="#B896DA"/>
+      <ellipse cx="122" cy="175" rx="16" ry="8" fill="#B896DA"/>
+      <defs>
+        <radialGradient id="bodyGrad4" cx="50%" cy="30%" r="70%">
+          <stop offset="0%" stop-color="#E8D5F5" stop-opacity="0.6"/>
+          <stop offset="100%" stop-color="#C9A7EB" stop-opacity="0"/>
+        </radialGradient>
+        <radialGradient id="headGrad4" cx="40%" cy="30%" r="65%">
+          <stop offset="0%" stop-color="#F0E4FA" stop-opacity="0.7"/>
+          <stop offset="100%" stop-color="#D4B5F0" stop-opacity="0"/>
+        </radialGradient>
+      </defs>
+    </svg>
+  </div>
+
+  <script>
+  (function() {
+    "use strict";
+    var starsLayer=document.getElementById("starsLayer");
+    var starColors=["","star--pink","star--purple","star--cyan","star--gold"];
+    for(var i=0;i<80;i++){var s=document.createElement("div");s.className="star "+starColors[Math.floor(Math.random()*starColors.length)];var sz=Math.random()*4+1.5;s.style.cssText="width:"+sz+"px;height:"+sz+"px;top:"+Math.random()*100+"%;left:"+Math.random()*100+"%;--dur:"+(Math.random()*3+2)+"s;--delay:"+(Math.random()*5)+"s;";starsLayer.appendChild(s);}
+    var canvas=document.getElementById("trailCanvas"),ctx=canvas.getContext("2d"),W,H;
+    function resize(){W=canvas.width=window.innerWidth;H=canvas.height=window.innerHeight;}
+    resize();window.addEventListener("resize",resize);
+    var particles=[],trailColors=["#A87CDB","#F2A7C3","#7EC8E3","#F5C56A","#D4B5F0","#FFD1DC","#B5E8D5","#FFB88C"];
+    var mouseX=-100,mouseY=-100,lastX=-100,lastY=-100,trailActive=false;
+    document.addEventListener("mousemove",function(e){mouseX=e.clientX;mouseY=e.clientY;trailActive=true;});
+    document.addEventListener("mouseleave",function(){trailActive=false;});
+    function drawStar(cx,cy,r,rot){ctx.save();ctx.translate(cx,cy);ctx.rotate(rot);ctx.beginPath();for(var i=0;i<5;i++){var a=(i*4*Math.PI)/5-Math.PI/2;var x=Math.cos(a)*r;var y=Math.sin(a)*r;i===0?ctx.moveTo(x,y):ctx.lineTo(x,y);}ctx.closePath();ctx.restore();}
+    function animateTrail(){ctx.clearRect(0,0,W,H);if(trailActive){var dx=mouseX-lastX,dy=mouseY-lastY,dist=Math.sqrt(dx*dx+dy*dy);var count=Math.min(Math.floor(dist/3)+1,5);for(var i=0;i<count;i++){var t=i/count;particles.push({x:lastX+dx*t+(Math.random()-0.5)*8,y:lastY+dy*t+(Math.random()-0.5)*8,vx:(Math.random()-0.5)*2.5,vy:(Math.random()-0.5)*2.5+0.5,size:Math.random()*6+3,color:trailColors[Math.floor(Math.random()*trailColors.length)],alpha:1,decay:Math.random()*0.015+0.012,rotation:Math.random()*Math.PI*2,rotSpeed:(Math.random()-0.5)*0.15,shape:Math.random()>0.5?"circle":"star"});}lastX=mouseX;lastY=mouseY;}for(var i=particles.length-1;i>=0;i--){var p=particles[i];p.x+=p.vx;p.y+=p.vy;p.vy+=0.03;p.alpha-=p.decay;p.size*=0.985;p.rotation+=p.rotSpeed;if(p.alpha<=0||p.size<0.5){particles.splice(i,1);continue;}ctx.save();ctx.globalAlpha=p.alpha;ctx.fillStyle=p.color;ctx.shadowColor=p.color;ctx.shadowBlur=8;if(p.shape==="star"){drawStar(p.x,p.y,p.size,p.rotation);ctx.fill();}else{ctx.beginPath();ctx.arc(p.x,p.y,p.size,0,Math.PI*2);ctx.fill();}ctx.restore();}if(particles.length>400)particles.splice(0,particles.length-400);requestAnimationFrame(animateTrail);}
+    animateTrail();
+    var mascot=document.getElementById("mascot"),pupilL=document.getElementById("pupilL"),pupilR=document.getElementById("pupilR"),shineL=document.getElementById("shineL"),shineR=document.getElementById("shineR");
+    var eyeL={x:82,y:78},eyeR={x:118,y:78},maxP=6,maxS=4;
+    document.addEventListener("mousemove",function(){var r=mascot.getBoundingClientRect();var cx=r.left+r.width/2,cy=r.top+r.height*0.4;var dx=mouseX-cx,dy=mouseY-cy,d=Math.sqrt(dx*dx+dy*dy)||1;var nx=dx/d,ny=dy/d,sc=Math.min(d/300,1);var px=nx*maxP*sc,py=ny*maxP*sc,sx=nx*maxS*sc,sy=ny*maxS*sc;pupilL.setAttribute("cx",eyeL.x+px);pupilL.setAttribute("cy",eyeL.y+py);pupilR.setAttribute("cx",eyeR.x+px);pupilR.setAttribute("cy",eyeR.y+py);shineL.setAttribute("cx",eyeL.x+px+3+sx*0.3);shineL.setAttribute("cy",eyeL.y+py-4+sy*0.3);shineR.setAttribute("cx",eyeR.x+px+3+sx*0.3);shineR.setAttribute("cy",eyeR.y+py-4+sy*0.3);});
+    var revealEls=document.querySelectorAll(".glass");revealEls.forEach(function(el){el.style.opacity="0";el.style.transform="translateY(20px)";el.style.transition="opacity 0.6s ease, transform 0.6s ease";});
+    var obs=new IntersectionObserver(function(entries){entries.forEach(function(e){if(e.isIntersecting){e.target.style.opacity="1";e.target.style.transform="translateY(0)";obs.unobserve(e.target);}});},{threshold:0.1});
+    revealEls.forEach(function(el){obs.observe(el);});
+  })();
+  </script>
+</body>
+</html>

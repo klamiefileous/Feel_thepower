@@ -1,0 +1,34 @@
+site_name: 项目展示
+site_description: 清新风格的个人项目组合展示，适合 HR 快速浏览。
+site_author: 你的名字
+repo_name: 示例仓库
+nav:
+  - 首页: index.md
+  - 项目:
+      - BBQ 线索生成: projects/bbq-leadgen.md
+      - YouTube 评论分析: projects/youtube-painpoints.md
+      - 浏览器自动化 Demo: projects/webui-demo.md
+  - 关于我: about.md
+  - 部署说明: deploy.md
+  - 本地演示: local-demo.md
+theme:
+  name: material
+  palette:
+    scheme: default
+    primary: teal
+    accent: amber
+  font:
+    text: Noto Sans SC
+    code: Fira Code
+  logo: null
+  favicon: null
+  features:
+    - navigation.instant
+    - navigation.sections
+    - navigation.tabs
+    - search.highlight
+    - search.suggest
+extra_css:
+  - css/extra.css
+plugins:
+  - search

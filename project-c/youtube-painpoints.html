@@ -1,0 +1,653 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>YouTube Pain Point Pipeline | 项目详情</title>
+  <link rel="stylesheet" href="../style.css" />
+  <style>
+    .detail-shell { position:relative; z-index:1; max-width:1020px; margin:0 auto; padding:36px 24px 60px; }
+    .back-bar { margin-bottom:28px; }
+    .glass {
+      border-radius:24px; padding:32px;
+      background:var(--glass-bg); border:1.5px solid var(--glass-border);
+      box-shadow:0 4px 28px var(--glass-shadow), inset 0 1px 0 rgba(255,255,255,0.7);
+      backdrop-filter:blur(18px) saturate(1.2); -webkit-backdrop-filter:blur(18px) saturate(1.2);
+      margin-bottom:28px; position:relative; overflow:hidden;
+    }
+    .glass::before {
+      content:""; position:absolute; top:0; left:0; right:0; height:4px;
+      border-radius:24px 24px 0 0;
+      background:linear-gradient(90deg, var(--accent-purple), var(--accent-pink), var(--accent-cyan));
+    }
+    .detail-hero { padding:52px 36px; text-align:center; }
+    .detail-hero h1 {
+      font-size:clamp(1.8rem,3.5vw,2.8rem);
+      background:linear-gradient(135deg,#7B4FBF,#D4618C,#5B8FD4);
+      -webkit-background-clip:text; -webkit-text-fill-color:transparent;
+      background-clip:text; margin:0 0 14px;
+    }
+    .detail-hero .subtitle { color:var(--text-mid); font-size:1.05rem; max-width:720px; margin:0 auto 22px; }
+    .badge-row { display:flex; flex-wrap:wrap; gap:10px; justify-content:center; }
+    .badge { display:inline-flex; align-items:center; gap:5px; padding:6px 14px; border-radius:999px; font-size:0.78rem; font-weight:600; border:1px solid; }
+    .badge--purple { background:rgba(168,124,219,0.18); color:#7B4FBF; border-color:rgba(168,124,219,0.3); }
+    .badge--pink   { background:rgba(242,167,195,0.18); color:#C4587A; border-color:rgba(242,167,195,0.3); }
+    .badge--cyan   { background:rgba(126,200,227,0.18); color:#3A8BAD; border-color:rgba(126,200,227,0.3); }
+    .badge--gold   { background:rgba(245,197,106,0.18); color:#B8860B; border-color:rgba(245,197,106,0.3); }
+
+    .sec-title { display:flex; align-items:center; gap:10px; margin:0 0 18px; font-size:1.2rem; color:var(--text-dark); }
+    .sec-icon { display:flex; align-items:center; justify-content:center; width:34px; height:34px; border-radius:10px; flex-shrink:0; }
+    .icon--purple { background:linear-gradient(135deg,rgba(168,124,219,0.25),rgba(168,124,219,0.08)); }
+    .icon--pink   { background:linear-gradient(135deg,rgba(242,167,195,0.25),rgba(242,167,195,0.08)); }
+    .icon--cyan   { background:linear-gradient(135deg,rgba(126,200,227,0.25),rgba(126,200,227,0.08)); }
+    .icon--gold   { background:linear-gradient(135deg,rgba(245,197,106,0.25),rgba(245,197,106,0.08)); }
+
+    .arch-flow { display:flex; align-items:center; flex-wrap:wrap; gap:8px; padding:20px 0; justify-content:center; }
+    .arch-node { padding:12px 16px; border-radius:16px; font-size:0.82rem; font-weight:700; text-align:center; min-width:100px; line-height:1.35; }
+    .arch-node--purple { background:rgba(168,124,219,0.2); color:#7B4FBF; border:1.5px solid rgba(168,124,219,0.35); }
+    .arch-node--pink   { background:rgba(242,167,195,0.2); color:#C4587A; border:1.5px solid rgba(242,167,195,0.35); }
+    .arch-node--cyan   { background:rgba(126,200,227,0.2); color:#3A8BAD; border:1.5px solid rgba(126,200,227,0.35); }
+    .arch-node--gold   { background:rgba(245,197,106,0.2); color:#B8860B; border:1.5px solid rgba(245,197,106,0.35); }
+    .arch-arrow { color:var(--text-light); font-size:1.2rem; }
+
+    .file-tree { font-family:"Cascadia Code","Fira Code","Consolas",monospace; font-size:0.82rem; line-height:1.85; color:var(--text-mid); background:rgba(255,255,255,0.45); border-radius:16px; padding:20px 24px; border:1px solid rgba(200,180,230,0.25); }
+    .file-tree .dir { color:var(--accent-purple); font-weight:700; }
+    .file-tree .file { color:var(--text-mid); }
+    .file-tree .comment { color:var(--text-light); font-style:italic; }
+
+    .code-block { font-family:"Cascadia Code","Fira Code","Consolas",monospace; font-size:0.82rem; line-height:1.7; background:rgba(60,40,90,0.92); color:#E8D5F5; border-radius:16px; padding:22px 24px; overflow-x:auto; white-space:pre; position:relative; border:1px solid rgba(168,124,219,0.3); }
+    .code-block .kw  { color:#C9A7EB; }
+    .code-block .str { color:#A8E6CF; }
+    .code-block .fn  { color:#87CEEB; }
+    .code-block .cm  { color:#9A8BB5; }
+    .code-block .num { color:#F5C56A; }
+
+    .api-table { width:100%; border-collapse:collapse; font-size:0.9rem; }
+    .api-table th { text-align:left; padding:12px 16px; font-weight:700; background:rgba(168,124,219,0.12); color:var(--text-dark); border-bottom:2px solid rgba(168,124,219,0.2); }
+    .api-table td { padding:12px 16px; border-bottom:1px solid rgba(200,180,230,0.2); color:var(--text-mid); }
+    .api-table tr:last-child td { border-bottom:none; }
+    .api-table code { background:rgba(168,124,219,0.12); padding:2px 8px; border-radius:6px; font-family:monospace; font-size:0.85em; color:var(--accent-purple); }
+    .method-get { display:inline-block; padding:2px 10px; border-radius:6px; background:rgba(126,200,227,0.2); color:#3A8BAD; font-weight:700; font-size:0.75rem; font-family:monospace; }
+    .method-post { display:inline-block; padding:2px 10px; border-radius:6px; background:rgba(242,167,195,0.2); color:#C4587A; font-weight:700; font-size:0.75rem; font-family:monospace; }
+
+    .env-table { width:100%; border-collapse:collapse; font-size:0.88rem; }
+    .env-table th { text-align:left; padding:10px 14px; font-weight:700; background:rgba(245,197,106,0.12); color:var(--text-dark); border-bottom:2px solid rgba(245,197,106,0.2); }
+    .env-table td { padding:10px 14px; border-bottom:1px solid rgba(200,180,230,0.15); color:var(--text-mid); }
+    .env-table code { background:rgba(245,197,106,0.15); padding:2px 8px; border-radius:6px; font-family:monospace; font-size:0.85em; color:#B8860B; }
+    .env-required { display:inline-block; padding:1px 8px; border-radius:6px; background:rgba(242,167,195,0.2); color:#C4587A; font-size:0.72rem; font-weight:700; margin-left:6px; }
+    .env-optional { display:inline-block; padding:1px 8px; border-radius:6px; background:rgba(126,200,227,0.15); color:#3A8BAD; font-size:0.72rem; font-weight:700; margin-left:6px; }
+
+    .pipeline-steps { display:grid; gap:14px; margin-top:8px; }
+    .p-step { display:flex; gap:16px; align-items:flex-start; padding:18px 20px; border-radius:16px; background:rgba(255,255,255,0.45); border:1px solid rgba(200,180,230,0.2); transition:transform 0.2s ease, box-shadow 0.2s ease; }
+    .p-step:hover { transform:translateX(4px); box-shadow:0 4px 16px rgba(168,124,219,0.15); }
+    .p-step-num { display:flex; align-items:center; justify-content:center; width:36px; height:36px; border-radius:50%; flex-shrink:0; font-weight:800; font-size:0.9rem; background:linear-gradient(135deg,var(--accent-purple),var(--accent-pink)); color:white; }
+    .p-step-body h4 { margin:0 0 4px; font-size:0.95rem; color:var(--text-dark); }
+    .p-step-body p  { margin:0; font-size:0.88rem; color:var(--text-mid); }
+
+    .module-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:14px; margin-top:8px; }
+    .mod-card { padding:20px; border-radius:18px; background:rgba(255,255,255,0.5); border:1px solid rgba(200,180,230,0.2); transition:transform 0.2s ease, box-shadow 0.2s ease; }
+    .mod-card:hover { transform:translateY(-3px); box-shadow:0 8px 24px rgba(168,124,219,0.18); }
+    .mod-card h4 { margin:0 0 8px; color:var(--text-dark); font-size:0.95rem; }
+    .mod-card .mod-path { font-family:monospace; font-size:0.76rem; color:var(--accent-purple); margin-bottom:8px; display:block; }
+    .mod-card p { margin:0; font-size:0.87rem; color:var(--text-mid); }
+
+    .param-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:12px; margin-top:12px; }
+    .param-card { padding:16px; border-radius:14px; background:rgba(255,255,255,0.5); border:1px solid rgba(200,180,230,0.2); }
+    .param-card .param-name { font-family:monospace; font-size:0.82rem; color:var(--accent-purple); font-weight:700; margin-bottom:4px; }
+    .param-card .param-range { font-size:0.75rem; color:var(--text-light); margin-bottom:6px; }
+    .param-card .param-desc { font-size:0.85rem; color:var(--text-mid); }
+
+    @media (max-width:720px) {
+      .detail-hero { padding:36px 20px; }
+      .glass { padding:22px 18px; border-radius:20px; }
+      .arch-flow { flex-direction:column; }
+      .arch-arrow { transform:rotate(90deg); }
+      .module-grid { grid-template-columns:1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="stars-layer" id="starsLayer" aria-hidden="true"></div>
+  <img class="dragon-bg" src="../images/kali-dragon-bg.png" alt="" aria-hidden="true" />
+  <canvas id="trailCanvas" aria-hidden="true"></canvas>
+
+  <div class="detail-shell">
+
+    <div class="back-bar">
+      <a href="../index.html" class="btn btn-secondary">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+        返回主页
+      </a>
+    </div>
+
+    <!-- ====== Hero ====== -->
+    <div class="glass detail-hero">
+      <p class="eyebrow" style="margin-bottom:14px;">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22.54 6.42a2.78 2.78 0 0 0-1.94-2C18.88 4 12 4 12 4s-6.88 0-8.6.46a2.78 2.78 0 0 0-1.94 2A29 29 0 0 0 1 11.75a29 29 0 0 0 .46 5.33A2.78 2.78 0 0 0 3.4 19.13C5.12 19.56 12 19.56 12 19.56s6.88 0 8.6-.46a2.78 2.78 0 0 0 1.94-2 29 29 0 0 0 .46-5.25 29 29 0 0 0-.46-5.33z"/><polygon points="9.75 15.02 15.5 11.75 9.75 8.48 9.75 15.02"/></svg>
+        YouTube 评论分析
+      </p>
+      <h1>YouTube Pain Point Pipeline</h1>
+      <p class="subtitle">
+        输入一个关键词，自动爬取 YouTube 热门视频、多维度采集评论、LLM 分类与清洗、分批深度分析痛点，
+        最终输出商业决策（YES/NO/MAYBE）与营销文案。支持 Ollama 本地 LLM 和 Supabase 持久化。
+      </p>
+      <div class="badge-row">
+        <span class="badge badge--purple">Python</span>
+        <span class="badge badge--cyan">FastAPI</span>
+        <span class="badge badge--pink">Playwright</span>
+        <span class="badge badge--gold">OpenAI / Ollama</span>
+        <span class="badge badge--purple">Supabase</span>
+        <span class="badge badge--cyan">Pydantic</span>
+        <span class="badge badge--pink">Pandas</span>
+        <span class="badge badge--gold">asyncio</span>
+      </div>
+    </div>
+
+    <!-- ====== Architecture ====== -->
+    <div class="glass">
+      <h3 class="sec-title">
+        <span class="sec-icon icon--purple">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#7B4FBF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+        </span>
+        系统架构
+      </h3>
+      <div class="arch-flow">
+        <div class="arch-node arch-node--gold">关键词输入<br><small>keyword</small></div>
+        <span class="arch-arrow">&#10132;</span>
+        <div class="arch-node arch-node--purple">Playwright<br><small>视频爬取</small></div>
+        <span class="arch-arrow">&#10132;</span>
+        <div class="arch-node arch-node--cyan">LLM 视频<br><small>二次筛选</small></div>
+        <span class="arch-arrow">&#10132;</span>
+        <div class="arch-node arch-node--pink">评论采集<br><small>Top/Latest/痛点</small></div>
+        <span class="arch-arrow">&#10132;</span>
+        <div class="arch-node arch-node--gold">LLM 分类<br><small>清洗+价值筛选</small></div>
+        <span class="arch-arrow">&#10132;</span>
+        <div class="arch-node arch-node--purple">分批分析<br><small>痛点+需求</small></div>
+        <span class="arch-arrow">&#10132;</span>
+        <div class="arch-node arch-node--cyan">汇总决策<br><small>商业输出</small></div>
+      </div>
+      <p style="color:var(--text-mid);font-size:0.88rem;text-align:center;margin-top:6px;">
+        通过 <code style="background:rgba(168,124,219,0.12);padding:2px 6px;border-radius:4px;font-size:0.85em;color:var(--accent-purple);">POST /analyze</code> 触发，全流程异步执行，并发限制为 2 避免触发 YouTube 反爬
+      </p>
+    </div>
+
+    <!-- ====== Pipeline Steps ====== -->
+    <div class="glass">
+      <h3 class="sec-title">
+        <span class="sec-icon icon--pink">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#C4587A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+        </span>
+        Pipeline 执行流程
+      </h3>
+      <div class="pipeline-steps">
+        <div class="p-step">
+          <div class="p-step-num">1</div>
+          <div class="p-step-body">
+            <h4>视频爬取 (VideoCollector)</h4>
+            <p>Playwright 启动 Chromium，访问 YouTube 搜索结果页（按播放量排序），自动滚动加载更多视频卡片。提取 video_id、标题、播放量、发布时间，然后逐个访问视频页面补充点赞数和评论数，计算互动得分（views×0.4 + comments×0.3 + like_ratio×0.3）。</p>
+          </div>
+        </div>
+        <div class="p-step">
+          <div class="p-step-num">2</div>
+          <div class="p-step-body">
+            <h4>LLM 视频筛选 (VideoSelector)</h4>
+            <p>将候选视频列表发送给 LLM，按高互动、产品相关、问题/对比类视频优先的标准，选出 TOP N 视频并给出选择理由。可关闭此步骤，退回互动得分排序。</p>
+          </div>
+        </div>
+        <div class="p-step">
+          <div class="p-step-num">3</div>
+          <div class="p-step-body">
+            <h4>评论多维采集 (CommentCollector)</h4>
+            <p>对每个视频：先按"Top"排序滚动采集热门评论，再切换"Newest"排序采集最新评论。过滤无效评论（太短、纯表情），按评分排序取 Top N，额外用痛点关键词（bad/leak/broken/problem 等）匹配痛点评论。三维度合并去重。</p>
+          </div>
+        </div>
+        <div class="p-step">
+          <div class="p-step-num">4</div>
+          <div class="p-step-body">
+            <h4>LLM 评论分类 (CommentClassifier)</h4>
+            <p>先用规则引擎（关键词匹配）做初分类：pain_point / positive / neutral。对痛点候选评论送 LLM 二次确认，带重试机制（最多2次）。最终合并为三类评论列表。</p>
+          </div>
+        </div>
+        <div class="p-step">
+          <div class="p-step-num">5</div>
+          <div class="p-step-body">
+            <h4>评论清洗 + 价值筛选 (CommentProcessing)</h4>
+            <p>Keyword 级流水线第一步：LLM 去除垃圾评论（spam/纯表情/无意义短评论/离题内容）。第二步：LLM 仅保留含产品信息、用户抱怨、改进建议、使用体验的高价值评论。</p>
+          </div>
+        </div>
+        <div class="p-step">
+          <div class="p-step-num">6</div>
+          <div class="p-step-body">
+            <h4>分批核心分析 (InsightPipeline)</h4>
+            <p>将高价值评论按 batch_size（默认80条/批）分批送入 LLM，每批提取：top 痛点列表、用户真实需求、产品改进建议、高频 SEO 关键词、推荐卖点。Pydantic 结构化验证输出。</p>
+          </div>
+        </div>
+        <div class="p-step">
+          <div class="p-step-num">7</div>
+          <div class="p-step-body">
+            <h4>汇总 + 决策 + 商业输出</h4>
+            <p>多批分析结果由 LLM 汇总为最终报告（去重、排序、强化结论）。然后做出商业决策（YES/NO/MAYBE + 市场分析 + 策略建议），最终生成 SEO 标题、卖点、广告文案、目标人群定位。</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ====== Project Structure ====== -->
+    <div class="glass">
+      <h3 class="sec-title">
+        <span class="sec-icon icon--cyan">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#3A8BAD" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+        </span>
+        项目结构
+      </h3>
+      <div class="file-tree">
+<span class="dir">youtube_video_comment_scraper/</span>
+├── <span class="file">main.py</span>                  <span class="comment"># FastAPI 入口 — POST /analyze 主编排</span>
+├── <span class="file">run_server.py</span>              <span class="comment"># 智能端口选择启动脚本</span>
+├── <span class="file">video_collector.py</span>         <span class="comment"># Playwright YouTube 搜索 + 视频数据采集</span>
+├── <span class="file">video_selector.py</span>          <span class="comment"># LLM 二次筛选 TOP 视频</span>
+├── <span class="file">comment_collector.py</span>       <span class="comment"># 评论多维采集 (Top/Latest/痛点关键词)</span>
+├── <span class="file">comment_classifier.py</span>      <span class="comment"># 评论分类 (规则+LLM 混合)</span>
+├── <span class="file">comment_processing.py</span>      <span class="comment"># 评论清洗 + 高价值筛选</span>
+├── <span class="file">insight_pipeline.py</span>        <span class="comment"># 分批分析/汇总/决策/商业输出</span>
+├── <span class="file">llm_client.py</span>              <span class="comment"># OpenAI/Ollama 客户端封装</span>
+├── <span class="file">pain_extractor.py</span>          <span class="comment"># 痛点提取 (视频级, 可选)</span>
+├── <span class="file">script_generator.py</span>        <span class="comment"># 营销脚本生成 (视频级, 可选)</span>
+├── <span class="file">database.py</span>                <span class="comment"># Supabase 数据访问层 (6表)</span>
+├── <span class="file">exporter.py</span>                <span class="comment"># CSV 导出</span>
+├── <span class="file">schema.sql</span>                 <span class="comment"># Supabase 建表 SQL</span>
+├── <span class="file">requirements.txt</span>           <span class="comment"># 依赖清单</span>
+├── <span class="file">.env.example</span>               <span class="comment"># 环境变量模板</span>
+├── <span class="file">README.md</span>
+├── <span class="dir">app/</span>
+│   ├── <span class="file">settings.py</span>            <span class="comment"># pydantic-settings 配置</span>
+│   ├── <span class="file">llm_schemas.py</span>         <span class="comment"># Pydantic 模型定义 (LLM 输出验证)</span>
+│   └── <span class="file">logging_config.py</span>      <span class="comment"># 日志配置</span>
+└── <span class="dir">static/</span>
+    └── <span class="file">index.html</span>             <span class="comment"># 前端调用界面</span>
+      </div>
+    </div>
+
+    <!-- ====== Core Modules ====== -->
+    <div class="glass">
+      <h3 class="sec-title">
+        <span class="sec-icon icon--purple">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#7B4FBF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg>
+        </span>
+        核心模块说明
+      </h3>
+      <div class="module-grid">
+        <div class="mod-card">
+          <h4>VideoCollector</h4>
+          <span class="mod-path">video_collector.py</span>
+          <p>Playwright 驱动 Chromium，访问 YouTube 搜索结果页（sp=CAMSAhAB 按播放量排序），自动滚动加载，提取视频卡片数据，逐个访问视频页补充点赞/评论数，计算 engagement_score 后排序截取 Top N。</p>
+        </div>
+        <div class="mod-card">
+          <h4>CommentCollector</h4>
+          <span class="mod-path">comment_collector.py</span>
+          <p>对每个视频切换排序方式（Top/Newest）采集评论，过滤无效评论（&lt;10字符、纯lol/wow），按 (likes×0.7 + len×0.3) 评分排序。额外用 PAIN_KEYWORDS 匹配痛点评论。返回三维度：top/latest/keyword。</p>
+        </div>
+        <div class="mod-card">
+          <h4>CommentClassifier</h4>
+          <span class="mod-path">comment_classifier.py</span>
+          <p>混合分类策略：先用规则引擎（PAIN_KEYWORDS / POSITIVE_KEYWORDS）初分类，对痛点候选评论送 LLM 二次确认（带重试），最终输出 pain_point / positive / neutral 三类列表。</p>
+        </div>
+        <div class="mod-card">
+          <h4>CommentProcessing</h4>
+          <span class="mod-path">comment_processing.py</span>
+          <p>两步 LLM 处理：clean_comments 去除 spam/纯表情/无意义评论；filter_high_value_comments 仅保留含产品问题、用户抱怨、改进建议、使用体验的信息价值评论。Pydantic 验证输出。</p>
+        </div>
+        <div class="mod-card">
+          <h4>InsightPipeline</h4>
+          <span class="mod-path">insight_pipeline.py</span>
+          <p>四步 LLM 管道：analyze_comments_batch（分批提取痛点/需求/建议/关键词/卖点）→ aggregate_batch_analyses（多批汇总去重排序）→ decide_business（YES/NO/MAYBE决策）→ generate_commercial_output（标题/卖点/广告/定位）。</p>
+        </div>
+        <div class="mod-card">
+          <h4>LLMClient</h4>
+          <span class="mod-path">llm_client.py</span>
+          <p>统一 LLM 调用层：基于 OpenAI AsyncClient，兼容 Ollama 本地模型。chat_and_validate 带最多3次重试，强制 JSON 输出并用 Pydantic 模型验证。chat_json_array 验证数组输出。</p>
+        </div>
+        <div class="mod-card">
+          <h4>LLMSchemas</h4>
+          <span class="mod-path">app/llm_schemas.py</span>
+          <p>Pydantic 模型定义所有 LLM 输出结构：VideoSelectionResponse、CoreAnalysisResponse、DecisionResponse、CommercialOutputResponse、FinalReportResponse 等，确保 LLM 输出格式正确。</p>
+        </div>
+        <div class="mod-card">
+          <h4>Database</h4>
+          <span class="mod-path">database.py</span>
+          <p>Supabase 数据访问层，6 张表的 CRUD 操作：videos (upsert)、comments (insert)、pain_points (upsert)、scripts (insert)、analysis_results (upsert by keyword+batch)、final_reports (upsert by keyword)。</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ====== Database Schema ====== -->
+    <div class="glass">
+      <h3 class="sec-title">
+        <span class="sec-icon icon--gold">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#B8860B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg>
+        </span>
+        数据库 Schema (6 张表)
+      </h3>
+      <div class="code-block"><span class="cm">-- 视频信息表</span>
+<span class="kw">CREATE TABLE</span> videos (
+  id                <span class="fn">text</span> <span class="kw">PRIMARY KEY</span>,
+  title             <span class="fn">text</span> <span class="kw">NOT NULL</span>,
+  views             <span class="fn">bigint</span>,
+  likes             <span class="fn">bigint</span>,
+  comment_count     <span class="fn">bigint</span>,
+  engagement_score  <span class="fn">double precision</span>,
+  collected_at      <span class="fn">timestamptz</span> <span class="kw">DEFAULT now()</span>
+);
+
+<span class="cm">-- 评论表 (外键关联 videos)</span>
+<span class="kw">CREATE TABLE</span> comments (
+  id           <span class="fn">bigserial</span> <span class="kw">PRIMARY KEY</span>,
+  video_id     <span class="fn">text</span> <span class="kw">REFERENCES</span> videos(id) <span class="kw">ON DELETE CASCADE</span>,
+  content      <span class="fn">text</span> <span class="kw">NOT NULL</span>,
+  category     <span class="fn">text</span> <span class="kw">NOT NULL</span>,   <span class="cm">-- pain_point / positive / neutral</span>
+  source       <span class="fn">text</span> <span class="kw">NOT NULL</span>,   <span class="cm">-- top / latest / keyword</span>
+  like_count   <span class="fn">bigint</span>,
+  published_at <span class="fn">timestamptz</span>,
+  collected_at <span class="fn">timestamptz</span> <span class="kw">DEFAULT now()</span>
+);
+
+<span class="cm">-- 痛点表 (每视频一条 JSON)</span>
+<span class="kw">CREATE TABLE</span> pain_points (
+  video_id        <span class="fn">text</span> <span class="kw">PRIMARY KEY REFERENCES</span> videos(id),
+  structured_json <span class="fn">jsonb</span> <span class="kw">NOT NULL</span>,
+  collected_at    <span class="fn">timestamptz</span> <span class="kw">DEFAULT now()</span>
+);
+
+<span class="cm">-- 营销脚本表</span>
+<span class="kw">CREATE TABLE</span> scripts (
+  id          <span class="fn">bigserial</span> <span class="kw">PRIMARY KEY</span>,
+  video_id    <span class="fn">text</span> <span class="kw">REFERENCES</span> videos(id),
+  script_text <span class="fn">text</span> <span class="kw">NOT NULL</span>,
+  collected_at <span class="fn">timestamptz</span> <span class="kw">DEFAULT now()</span>
+);
+
+<span class="cm">-- 分批分析结果表 (keyword + batch_index 幂等 upsert)</span>
+<span class="kw">CREATE TABLE</span> analysis_results (
+  keyword         <span class="fn">text</span> <span class="kw">NOT NULL</span>,
+  batch_index     <span class="fn">int</span> <span class="kw">NOT NULL</span>,
+  structured_json <span class="fn">jsonb</span> <span class="kw">NOT NULL</span>,
+  collected_at    <span class="fn">timestamptz</span> <span class="kw">DEFAULT now()</span>,
+  <span class="kw">PRIMARY KEY</span> (keyword, batch_index)
+);
+
+<span class="cm">-- 最终报告表 (每 keyword 一条)</span>
+<span class="kw">CREATE TABLE</span> final_reports (
+  keyword           <span class="fn">text</span> <span class="kw">PRIMARY KEY</span>,
+  final_report_json <span class="fn">jsonb</span> <span class="kw">NOT NULL</span>,
+  decision_json     <span class="fn">jsonb</span>,       <span class="cm">-- YES/NO/MAYBE 决策</span>
+  commercial_json   <span class="fn">jsonb</span>,       <span class="cm">-- 标题/卖点/广告/定位</span>
+  collected_at      <span class="fn">timestamptz</span> <span class="kw">DEFAULT now()</span>
+);</div>
+    </div>
+
+    <!-- ====== API Endpoints ====== -->
+    <div class="glass">
+      <h3 class="sec-title">
+        <span class="sec-icon icon--cyan">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#3A8BAD" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+        </span>
+        API 接口
+      </h3>
+      <div style="overflow-x:auto;">
+        <table class="api-table">
+          <thead>
+            <tr><th>方法</th><th>路径</th><th>说明</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><span class="method-get">GET</span></td>
+              <td><code>/</code></td>
+              <td>返回前端调用界面 (static/index.html)</td>
+            </tr>
+            <tr>
+              <td><span class="method-post">POST</span></td>
+              <td><code>/analyze</code></td>
+              <td>触发完整分析管道，返回视频列表、评论分类、分批分析、最终报告、商业输出</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h4 style="font-size:0.95rem;color:var(--text-dark);margin:22px 0 12px;">POST /analyze 请求参数</h4>
+      <div class="param-grid">
+        <div class="param-card">
+          <div class="param-name">keyword</div>
+          <div class="param-range">string, 必填</div>
+          <div class="param-desc">搜索关键词，英文优先（如 foil tray, wireless meat thermometer）</div>
+        </div>
+        <div class="param-card">
+          <div class="param-name">video_count</div>
+          <div class="param-range">1 ~ 30, 默认 10</div>
+          <div class="param-desc">爬虫层抓取候选视频数量</div>
+        </div>
+        <div class="param-card">
+          <div class="param-name">selected_video_count</div>
+          <div class="param-range">1 ~ 10, 默认 5</div>
+          <div class="param-desc">LLM 筛选后进入深度分析的视频数</div>
+        </div>
+        <div class="param-card">
+          <div class="param-name">top_comment_count</div>
+          <div class="param-range">1 ~ 100, 默认 5</div>
+          <div class="param-desc">每视频抽取的高分评论数量</div>
+        </div>
+        <div class="param-card">
+          <div class="param-name">comment_batch_size</div>
+          <div class="param-range">20 ~ 120, 默认 80</div>
+          <div class="param-desc">LLM 分析时每批评论数</div>
+        </div>
+        <div class="param-card">
+          <div class="param-name">max_total_comments</div>
+          <div class="param-range">50 ~ 2000, 默认 600</div>
+          <div class="param-desc">keyword 级管道最大评论总数（控成本核心）</div>
+        </div>
+        <div class="param-card">
+          <div class="param-name">export_csv</div>
+          <div class="param-range">bool, 默认 false</div>
+          <div class="param-desc">是否导出评论为 CSV 文件</div>
+        </div>
+        <div class="param-card">
+          <div class="param-name">enable_llm_*</div>
+          <div class="param-range">bool, 默认 true</div>
+          <div class="param-desc">各环节 LLM 开关（video_select / comment_clean / value_filter / core_analysis / batch_aggregate / decision / commercial / comment_classify）</div>
+        </div>
+      </div>
+
+      <h4 style="font-size:0.9rem;color:var(--text-dark);margin:20px 0 10px;">请求示例</h4>
+      <div class="code-block"><span class="fn">POST</span> /analyze
+{
+  <span class="str">"keyword"</span>: <span class="str">"foil tray"</span>,
+  <span class="str">"export_csv"</span>: <span class="kw">true</span>,
+  <span class="str">"video_count"</span>: <span class="num">10</span>,
+  <span class="str">"selected_video_count"</span>: <span class="num">5</span>,
+  <span class="str">"top_comment_count"</span>: <span class="num">5</span>,
+  <span class="str">"comment_batch_size"</span>: <span class="num">80</span>,
+  <span class="str">"max_total_comments"</span>: <span class="num">600</span>,
+  <span class="str">"enable_llm_video_select"</span>: <span class="kw">true</span>,
+  <span class="str">"enable_llm_comment_clean"</span>: <span class="kw">true</span>,
+  <span class="str">"enable_llm_value_filter"</span>: <span class="kw">true</span>
+}</div>
+    </div>
+
+    <!-- ====== Environment Variables ====== -->
+    <div class="glass">
+      <h3 class="sec-title">
+        <span class="sec-icon icon--gold">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#B8860B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+        </span>
+        环境变量配置
+      </h3>
+      <div style="overflow-x:auto;">
+        <table class="env-table">
+          <thead><tr><th>变量名</th><th>默认值</th><th>说明</th></tr></thead>
+          <tbody>
+            <tr>
+              <td><code>OPENAI_API_KEY</code><span class="env-required">必填</span></td>
+              <td><code>ollama</code></td>
+              <td>OpenAI API Key 或填 "ollama" 使用本地模型</td>
+            </tr>
+            <tr>
+              <td><code>OPENAI_BASE_URL</code><span class="env-optional">可选</span></td>
+              <td><code>http://localhost:11434/v1</code></td>
+              <td>兼容 OpenAI 的 API 地址（Ollama 本地默认端口）</td>
+            </tr>
+            <tr>
+              <td><code>OPENAI_MODEL</code><span class="env-optional">可选</span></td>
+              <td><code>llama3.1:8b</code></td>
+              <td>使用的模型名称</td>
+            </tr>
+            <tr>
+              <td><code>SUPABASE_URL</code><span class="env-optional">可选</span></td>
+              <td>-</td>
+              <td>Supabase 项目 URL（不配置则不持久化）</td>
+            </tr>
+            <tr>
+              <td><code>SUPABASE_SERVICE_ROLE_KEY</code><span class="env-optional">可选</span></td>
+              <td>-</td>
+              <td>Supabase Service Role Key</td>
+            </tr>
+            <tr>
+              <td><code>PLAYWRIGHT_HEADLESS</code><span class="env-optional">可选</span></td>
+              <td><code>false</code></td>
+              <td>是否无头模式运行浏览器（调试时设 false）</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ====== Deployment ====== -->
+    <div class="glass">
+      <h3 class="sec-title">
+        <span class="sec-icon icon--pink">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#C4587A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 14.899A7 7 0 1 1 15.71 8h1.79a4.5 4.5 0 0 1 2.5 8.242"/><polyline points="12 12 12 21"/><polyline points="8 17 12 21 16 17"/></svg>
+        </span>
+        部署指南
+      </h3>
+
+      <h4 style="font-size:0.95rem;color:var(--text-dark);margin-bottom:12px;">1. 安装依赖</h4>
+      <div class="code-block">pip install -r requirements.txt
+
+<span class="cm"># 安装 Playwright 浏览器（首次需要）</span>
+playwright install chromium</div>
+
+      <h4 style="font-size:0.95rem;color:var(--text-dark);margin:20px 0 12px;">2. 配置 Ollama（本地 LLM）</h4>
+      <div class="code-block"><span class="cm"># 确保 Ollama 已安装并拉取模型</span>
+ollama pull llama3.1:8b
+ollama serve
+
+<span class="cm"># 复制 .env.example 为 .env 并填入配置</span>
+<span class="cm"># OPENAI_API_KEY=ollama</span>
+<span class="cm"># OPENAI_BASE_URL=http://localhost:11434/v1</span>
+<span class="cm"># OPENAI_MODEL=llama3.1:8b</span></div>
+
+      <h4 style="font-size:0.95rem;color:var(--text-dark);margin:20px 0 12px;">3. 启动 API</h4>
+      <div class="code-block"><span class="cm"># 智能选端口（推荐，自动避开 Windows 保留端口）</span>
+python run_server.py --reload
+
+<span class="cm"># 或手动指定端口</span>
+uvicorn main:app --reload --host <span class="num">127.0.0.1</span> --port <span class="num">8899</span></div>
+
+      <h4 style="font-size:0.95rem;color:var(--text-dark);margin:20px 0 12px;">4. Supabase 持久化（可选）</h4>
+      <div class="code-block"><span class="cm"># 在 Supabase SQL Editor 中执行 schema.sql</span>
+<span class="cm"># 然后在 .env 中填入 SUPABASE_URL 和 SUPABASE_SERVICE_ROLE_KEY</span>
+<span class="cm"># 未配置时接口仍正常返回结果，仅不写入数据库</span></div>
+
+      <div style="margin-top:18px;padding:16px 20px;border-radius:14px;background:rgba(245,197,106,0.12);border:1px solid rgba(245,197,106,0.25);">
+        <p style="margin:0;font-size:0.88rem;color:#8B6914;">
+          <strong>依赖清单：</strong>fastapi, uvicorn, pydantic, pydantic-settings, playwright, pandas, supabase, openai, python-dotenv, python-multipart
+        </p>
+      </div>
+
+      <div style="margin-top:12px;padding:16px 20px;border-radius:14px;background:rgba(242,167,195,0.1);border:1px solid rgba(242,167,195,0.2);">
+        <p style="margin:0;font-size:0.88rem;color:#9B4060;">
+          <strong>Windows 注意：</strong>若出现 <code style="background:rgba(242,167,195,0.15);padding:1px 4px;border-radius:3px;">WinError 10013</code>，通常是端口被系统排除范围占用。优先使用 <code style="background:rgba(242,167,195,0.15);padding:1px 4px;border-radius:3px;">python run_server.py --reload</code> 自动选可用端口。
+        </p>
+      </div>
+    </div>
+
+    <!-- ====== Footer ====== -->
+    <footer class="footer" style="text-align:center;">
+      <p>
+        <a href="../index.html" class="btn btn-secondary" style="min-width:120px;">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+          返回主页
+        </a>
+      </p>
+      <p style="margin-top:16px;">Made with <span class="footer-heart">&#9829;</span> — Powered by GitHub Pages</p>
+    </footer>
+
+  </div>
+
+  <!-- ====== Mascot ====== -->
+  <div class="mascot-wrapper" id="mascot" aria-hidden="true">
+    <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+      <ellipse cx="100" cy="135" rx="55" ry="45" fill="#C9A7EB"/>
+      <ellipse cx="100" cy="135" rx="55" ry="45" fill="url(#bodyGrad3)" opacity="0.5"/>
+      <ellipse cx="100" cy="145" rx="35" ry="28" fill="#EDD9F7"/>
+      <circle cx="100" cy="80" r="45" fill="#D4B5F0"/>
+      <circle cx="100" cy="80" r="45" fill="url(#headGrad3)" opacity="0.4"/>
+      <path d="M68 50 Q60 20 75 40" stroke="#A87CDB" stroke-width="5" fill="none" stroke-linecap="round"/>
+      <path d="M132 50 Q140 20 125 40" stroke="#A87CDB" stroke-width="5" fill="none" stroke-linecap="round"/>
+      <ellipse cx="62" cy="65" rx="12" ry="18" fill="#C9A7EB" transform="rotate(-20 62 65)"/>
+      <ellipse cx="138" cy="65" rx="12" ry="18" fill="#C9A7EB" transform="rotate(20 138 65)"/>
+      <ellipse cx="62" cy="65" rx="8" ry="12" fill="#EDD9F7" transform="rotate(-20 62 65)"/>
+      <ellipse cx="138" cy="65" rx="8" ry="12" fill="#EDD9F7" transform="rotate(20 138 65)"/>
+      <ellipse cx="82" cy="78" rx="15" ry="16" fill="white"/>
+      <ellipse cx="118" cy="78" rx="15" ry="16" fill="white"/>
+      <circle id="pupilL" cx="82" cy="80" r="8" fill="#4A2D73"/>
+      <circle id="pupilR" cx="118" cy="80" r="8" fill="#4A2D73"/>
+      <circle id="shineL" cx="85" cy="76" r="3" fill="white" opacity="0.9"/>
+      <circle id="shineR" cx="121" cy="76" r="3" fill="white" opacity="0.9"/>
+      <ellipse cx="68" cy="92" rx="10" ry="6" fill="#F5B8D1" opacity="0.6"/>
+      <ellipse cx="132" cy="92" rx="10" ry="6" fill="#F5B8D1" opacity="0.6"/>
+      <path d="M92 96 Q100 106 108 96" stroke="#7B4FBF" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+      <path d="M45 120 Q20 95 50 105 Q30 80 55 100" fill="#C9A7EB" opacity="0.85"/>
+      <path d="M155 120 Q180 95 150 105 Q170 80 145 100" fill="#C9A7EB" opacity="0.85"/>
+      <path d="M55 160 Q30 175 25 155 Q20 140 35 148" stroke="#C9A7EB" stroke-width="6" fill="none" stroke-linecap="round"/>
+      <ellipse cx="78" cy="175" rx="16" ry="8" fill="#B896DA"/>
+      <ellipse cx="122" cy="175" rx="16" ry="8" fill="#B896DA"/>
+      <defs>
+        <radialGradient id="bodyGrad3" cx="50%" cy="30%" r="70%">
+          <stop offset="0%" stop-color="#E8D5F5" stop-opacity="0.6"/>
+          <stop offset="100%" stop-color="#C9A7EB" stop-opacity="0"/>
+        </radialGradient>
+        <radialGradient id="headGrad3" cx="40%" cy="30%" r="65%">
+          <stop offset="0%" stop-color="#F0E4FA" stop-opacity="0.7"/>
+          <stop offset="100%" stop-color="#D4B5F0" stop-opacity="0"/>
+        </radialGradient>
+      </defs>
+    </svg>
+  </div>
+
+  <script>
+  (function() {
+    "use strict";
+    var starsLayer=document.getElementById("starsLayer");
+    var starColors=["","star--pink","star--purple","star--cyan","star--gold"];
+    for(var i=0;i<80;i++){var s=document.createElement("div");s.className="star "+starColors[Math.floor(Math.random()*starColors.length)];var sz=Math.random()*4+1.5;s.style.cssText="width:"+sz+"px;height:"+sz+"px;top:"+Math.random()*100+"%;left:"+Math.random()*100+"%;--dur:"+(Math.random()*3+2)+"s;--delay:"+(Math.random()*5)+"s;";starsLayer.appendChild(s);}
+    var canvas=document.getElementById("trailCanvas"),ctx=canvas.getContext("2d"),W,H;
+    function resize(){W=canvas.width=window.innerWidth;H=canvas.height=window.innerHeight;}
+    resize();window.addEventListener("resize",resize);
+    var particles=[],trailColors=["#A87CDB","#F2A7C3","#7EC8E3","#F5C56A","#D4B5F0","#FFD1DC","#B5E8D5","#FFB88C"];
+    var mouseX=-100,mouseY=-100,lastX=-100,lastY=-100,trailActive=false;
+    document.addEventListener("mousemove",function(e){mouseX=e.clientX;mouseY=e.clientY;trailActive=true;});
+    document.addEventListener("mouseleave",function(){trailActive=false;});
+    function drawStar(cx,cy,r,rot){ctx.save();ctx.translate(cx,cy);ctx.rotate(rot);ctx.beginPath();for(var i=0;i<5;i++){var a=(i*4*Math.PI)/5-Math.PI/2;var x=Math.cos(a)*r;var y=Math.sin(a)*r;i===0?ctx.moveTo(x,y):ctx.lineTo(x,y);}ctx.closePath();ctx.restore();}
+    function animateTrail(){ctx.clearRect(0,0,W,H);if(trailActive){var dx=mouseX-lastX,dy=mouseY-lastY,dist=Math.sqrt(dx*dx+dy*dy);var count=Math.min(Math.floor(dist/3)+1,5);for(var i=0;i<count;i++){var t=i/count;particles.push({x:lastX+dx*t+(Math.random()-0.5)*8,y:lastY+dy*t+(Math.random()-0.5)*8,vx:(Math.random()-0.5)*2.5,vy:(Math.random()-0.5)*2.5+0.5,size:Math.random()*6+3,color:trailColors[Math.floor(Math.random()*trailColors.length)],alpha:1,decay:Math.random()*0.015+0.012,rotation:Math.random()*Math.PI*2,rotSpeed:(Math.random()-0.5)*0.15,shape:Math.random()>0.5?"circle":"star"});}lastX=mouseX;lastY=mouseY;}for(var i=particles.length-1;i>=0;i--){var p=particles[i];p.x+=p.vx;p.y+=p.vy;p.vy+=0.03;p.alpha-=p.decay;p.size*=0.985;p.rotation+=p.rotSpeed;if(p.alpha<=0||p.size<0.5){particles.splice(i,1);continue;}ctx.save();ctx.globalAlpha=p.alpha;ctx.fillStyle=p.color;ctx.shadowColor=p.color;ctx.shadowBlur=8;if(p.shape==="star"){drawStar(p.x,p.y,p.size,p.rotation);ctx.fill();}else{ctx.beginPath();ctx.arc(p.x,p.y,p.size,0,Math.PI*2);ctx.fill();}ctx.restore();}if(particles.length>400)particles.splice(0,particles.length-400);requestAnimationFrame(animateTrail);}
+    animateTrail();
+    var mascot=document.getElementById("mascot"),pupilL=document.getElementById("pupilL"),pupilR=document.getElementById("pupilR"),shineL=document.getElementById("shineL"),shineR=document.getElementById("shineR");
+    var eyeL={x:82,y:78},eyeR={x:118,y:78},maxP=6,maxS=4;
+    document.addEventListener("mousemove",function(){var r=mascot.getBoundingClientRect();var cx=r.left+r.width/2,cy=r.top+r.height*0.4;var dx=mouseX-cx,dy=mouseY-cy,d=Math.sqrt(dx*dx+dy*dy)||1;var nx=dx/d,ny=dy/d,sc=Math.min(d/300,1);var px=nx*maxP*sc,py=ny*maxP*sc,sx=nx*maxS*sc,sy=ny*maxS*sc;pupilL.setAttribute("cx",eyeL.x+px);pupilL.setAttribute("cy",eyeL.y+py);pupilR.setAttribute("cx",eyeR.x+px);pupilR.setAttribute("cy",eyeR.y+py);shineL.setAttribute("cx",eyeL.x+px+3+sx*0.3);shineL.setAttribute("cy",eyeL.y+py-4+sy*0.3);shineR.setAttribute("cx",eyeR.x+px+3+sx*0.3);shineR.setAttribute("cy",eyeR.y+py-4+sy*0.3);});
+    var revealEls=document.querySelectorAll(".glass");revealEls.forEach(function(el){el.style.opacity="0";el.style.transform="translateY(20px)";el.style.transition="opacity 0.6s ease, transform 0.6s ease";});
+    var obs=new IntersectionObserver(function(entries){entries.forEach(function(e){if(e.isIntersecting){e.target.style.opacity="1";e.target.style.transform="translateY(0)";obs.unobserve(e.target);}});},{threshold:0.1});
+    revealEls.forEach(function(el){obs.observe(el);});
+  })();
+  </script>
+</body>
+</html>

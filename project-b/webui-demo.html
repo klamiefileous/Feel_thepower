@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Web UI 自动化 Demo</title>
+  <link rel="stylesheet" href="../style.css" />
+  <style>
+    body { background-image: url('assets/1.png'); background-size: cover; background-position: center; background-repeat: no-repeat; }
+    .page-shell { background: rgba(255,255,255,0.96); max-width: 980px; margin: 40px auto; padding: 28px; border-radius: 12px; }
+    .project-media { display:flex; gap:20px; flex-wrap:wrap; align-items:flex-start; margin-bottom:18px; }
+    .project-media video { max-width:640px; width:100%; border-radius:8px; box-shadow:0 8px 24px rgba(2,6,23,0.2); }
+    .project-media .screenshot { max-width:320px; width:100%; border-radius:8px; overflow:hidden; box-shadow:0 8px 24px rgba(2,6,23,0.12); }
+    .project-media .screenshot img { width:100%; display:block; }
+  </style>
+</head>
+<body>
+  <div class="page-shell">
+    <a href="../index.html" class="link-button">返回主页</a>
+    <h1>Web UI 自动化初代 Demo</h1>
+    <div class="project-media">
+      <video controls src="assets/demo.mp4" preload="metadata">你的浏览器不支持 video 标签。</video>
+      <div class="screenshot"><img src="assets/1.png" alt="项目展示图"></div>
+    </div>
+
+    <p>基于 Gradio 的 Web UI，结合浏览器自动化（playwright / browser-use）。适合作为产品化演进的前端展示。</p>
+
+    <h2>主要功能</h2>
+    <ul>
+      <li>Gradio Web UI 界面</li>
+      <li>支持多种 LLM：OpenAI、Azure、Ollama 等</li>
+      <li>自定义浏览器、持久会话与高分辨率录制</li>
+    </ul>
+
+    <h2>运行</h2>
+    <pre><code>python webui.py --ip 127.0.0.1 --port 7788
+# 访问 http://127.0.0.1:7788
+</code></pre>
+
+    <p>查看仓库 README 获取详细安装与 Docker 运行方法。</p>
+  </div>
+</body>
+</html>
