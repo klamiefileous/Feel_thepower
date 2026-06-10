@@ -1,19 +1,99 @@
-/*  sakura.js — 樱花飘落粒子动画 + 精致 BGM 播放器重设计
- *  用法：<script src="sakura.js"></script>
- *  会自动：
- *    1. 创建 Canvas 绘制樱花花瓣飘落动画
- *    2. 隐藏 starfield-bgm.js 的简陋播放器，创建精致新播放器
- *  可选配置：window.SAKURA_CONFIG = { petalCount: 40, darkMode: false }
+/*  sakura.js — 樱花树枝装饰 + 轻柔飘落花瓣
+ *  仅用于主页 (index.html)，营造淡雅樱花氛围
+ *  可选配置：window.SAKURA_CONFIG = { petals: 20, opacity: 0.22 }
  */
 (function () {
   "use strict";
 
   var CFG = window.SAKURA_CONFIG || {};
-  var PETAL_COUNT = CFG.petalCount || 40;
-  var DARK = CFG.darkMode !== undefined ? CFG.darkMode : false;
+  var PETAL_COUNT = CFG.petals || 20;
+  var TREE_OPACITY = CFG.opacity || 0.22;
 
   /* ========================================
-     1. 樱花飘落粒子动画
+     1. 樱花树枝 SVG 装饰
+     ======================================== */
+  var tree = document.createElement("div");
+  tree.className = "sakura-tree-wrap";
+  tree.setAttribute("aria-hidden", "true");
+  tree.innerHTML =
+    '<svg viewBox="0 0 600 520" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMaxYMin meet">' +
+      '<defs>' +
+        '<linearGradient id="sk-trunk" x1="0" y1="0" x2="0" y2="1">' +
+          '<stop offset="0%" stop-color="#8B7B6B"/>' +
+          '<stop offset="100%" stop-color="#6B5B4B"/>' +
+        '</linearGradient>' +
+        '<radialGradient id="sk-blos1" cx="50%" cy="50%" r="50%">' +
+          '<stop offset="0%" stop-color="#FFD6E0" stop-opacity="0.9"/>' +
+          '<stop offset="70%" stop-color="#FFB7C5" stop-opacity="0.6"/>' +
+          '<stop offset="100%" stop-color="#FFB7C5" stop-opacity="0"/>' +
+        '</radialGradient>' +
+        '<radialGradient id="sk-blos2" cx="50%" cy="50%" r="50%">' +
+          '<stop offset="0%" stop-color="#FFE4EC" stop-opacity="0.85"/>' +
+          '<stop offset="70%" stop-color="#FFD1DC" stop-opacity="0.5"/>' +
+          '<stop offset="100%" stop-color="#FFD1DC" stop-opacity="0"/>' +
+        '</radialGradient>' +
+        '<radialGradient id="sk-blos3" cx="50%" cy="50%" r="50%">' +
+          '<stop offset="0%" stop-color="#FFF0F5" stop-opacity="0.8"/>' +
+          '<stop offset="70%" stop-color="#FFE0EB" stop-opacity="0.4"/>' +
+          '<stop offset="100%" stop-color="#FFE0EB" stop-opacity="0"/>' +
+        '</radialGradient>' +
+      '</defs>' +
+
+      /* ── 主树干 ── */
+      '<path d="M560,520 Q545,460 530,410 Q510,350 490,300 Q470,250 455,210 Q440,170 430,140 Q420,110 415,85" stroke="url(#sk-trunk)" stroke-width="14" fill="none" stroke-linecap="round"/>' +
+
+      /* ── 树枝 ── */
+      '<path d="M430,140 Q390,115 340,95 Q300,80 260,72" stroke="url(#sk-trunk)" stroke-width="7" fill="none" stroke-linecap="round"/>' +
+      '<path d="M340,95 Q315,65 285,45 Q260,30 235,22" stroke="url(#sk-trunk)" stroke-width="4.5" fill="none" stroke-linecap="round"/>' +
+      '<path d="M455,210 Q415,185 370,168 Q335,155 295,145" stroke="url(#sk-trunk)" stroke-width="6" fill="none" stroke-linecap="round"/>' +
+      '<path d="M370,168 Q345,140 315,120 Q295,108 270,98" stroke="url(#sk-trunk)" stroke-width="4" fill="none" stroke-linecap="round"/>' +
+      '<path d="M490,300 Q455,275 415,258 Q385,245 350,235" stroke="url(#sk-trunk)" stroke-width="5.5" fill="none" stroke-linecap="round"/>' +
+      '<path d="M415,258 Q395,230 370,215" stroke="url(#sk-trunk)" stroke-width="3.5" fill="none" stroke-linecap="round"/>' +
+      '<path d="M510,350 Q480,330 450,318" stroke="url(#sk-trunk)" stroke-width="4" fill="none" stroke-linecap="round"/>' +
+      '<path d="M415,85 Q400,60 380,42" stroke="url(#sk-trunk)" stroke-width="3.5" fill="none" stroke-linecap="round"/>' +
+
+      /* ── 细枝 ── */
+      '<path d="M260,72 Q240,55 218,48" stroke="url(#sk-trunk)" stroke-width="2.5" fill="none" stroke-linecap="round"/>' +
+      '<path d="M295,145 Q275,130 255,122" stroke="url(#sk-trunk)" stroke-width="2.5" fill="none" stroke-linecap="round"/>' +
+      '<path d="M350,235 Q330,220 312,215" stroke="url(#sk-trunk)" stroke-width="2.5" fill="none" stroke-linecap="round"/>' +
+
+      /* ── 樱花簇 — 大团花 ── */
+      '<circle cx="260" cy="68" r="38" fill="url(#sk-blos1)"/>' +
+      '<circle cx="235" cy="22" r="32" fill="url(#sk-blos2)"/>' +
+      '<circle cx="218" cy="48" r="25" fill="url(#sk-blos3)"/>' +
+      '<circle cx="295" cy="140" r="35" fill="url(#sk-blos1)"/>' +
+      '<circle cx="270" cy="95" r="28" fill="url(#sk-blos2)"/>' +
+      '<circle cx="255" cy="122" r="22" fill="url(#sk-blos3)"/>' +
+      '<circle cx="350" cy="230" r="32" fill="url(#sk-blos1)"/>' +
+      '<circle cx="370" cy="212" r="26" fill="url(#sk-blos2)"/>' +
+      '<circle cx="312" cy="215" r="24" fill="url(#sk-blos3)"/>' +
+      '<circle cx="415" cy="80" r="30" fill="url(#sk-blos1)"/>' +
+      '<circle cx="380" cy="42" r="28" fill="url(#sk-blos2)"/>' +
+      '<circle cx="450" cy="315" r="28" fill="url(#sk-blos1)"/>' +
+      '<circle cx="430" cy="135" r="26" fill="url(#sk-blos3)"/>' +
+
+      /* ── 散花点缀 ── */
+      '<circle cx="340" cy="92" r="18" fill="url(#sk-blos3)"/>' +
+      '<circle cx="300" cy="78" r="15" fill="url(#sk-blos1)"/>' +
+      '<circle cx="460" cy="205" r="20" fill="url(#sk-blos2)"/>' +
+      '<circle cx="490" cy="295" r="22" fill="url(#sk-blos3)"/>' +
+      '<circle cx="510" cy="345" r="18" fill="url(#sk-blos2)"/>' +
+
+      /* ── 小花蕾 ── */
+      '<circle cx="230" cy="60" r="4" fill="#FFB7C5" opacity="0.6"/>' +
+      '<circle cx="250" cy="35" r="3.5" fill="#FFD1DC" opacity="0.55"/>' +
+      '<circle cx="280" cy="110" r="4" fill="#FFB7C5" opacity="0.5"/>' +
+      '<circle cx="310" cy="195" r="3.5" fill="#FFD1DC" opacity="0.55"/>' +
+      '<circle cx="365" cy="175" r="3" fill="#FFB7C5" opacity="0.5"/>' +
+      '<circle cx="400" cy="55" r="3.5" fill="#FFD1DC" opacity="0.5"/>' +
+      '<circle cx="440" cy="295" r="3" fill="#FFB7C5" opacity="0.55"/>' +
+    '</svg>';
+
+  tree.style.opacity = TREE_OPACITY;
+  document.body.appendChild(tree);
+
+  /* ========================================
+     2. 轻柔飘落花瓣（Canvas）
      ======================================== */
   var canvas = document.createElement("canvas");
   canvas.id = "sakuraCanvas";
@@ -30,35 +110,32 @@
   resize();
   window.addEventListener("resize", resize);
 
-  // 花瓣颜色池 — 柔和的粉白色系
   var petalColors = [
-    "#FFB7C5", "#FFC0CB", "#FFD1DC", "#FFDDE6",
-    "#FFF0F5", "#FFE4E9", "#FADADD", "#F8C8D8",
-    "#E8B4C8", "#F5D0D8", "#FFE0EB", "#FFD6E0"
+    "rgba(255,183,197,0.5)", "rgba(255,209,220,0.45)",
+    "rgba(255,228,236,0.4)", "rgba(255,192,203,0.45)",
+    "rgba(255,240,245,0.35)", "rgba(250,218,221,0.4)"
   ];
 
   var petals = [];
-
   function createPetal() {
     return {
       x: Math.random() * W,
-      y: -20 - Math.random() * H * 0.3,
-      size: Math.random() * 10 + 5,
-      speed: Math.random() * 1.0 + 0.4,
+      y: -15 - Math.random() * H * 0.2,
+      size: Math.random() * 7 + 3,
+      speed: Math.random() * 0.6 + 0.2,
       angle: Math.random() * Math.PI * 2,
-      spin: (Math.random() - 0.5) * 0.03,
-      swingAmp: Math.random() * 30 + 10,
-      swingSpeed: Math.random() * 0.015 + 0.005,
+      spin: (Math.random() - 0.5) * 0.015,
       swingPhase: Math.random() * Math.PI * 2,
+      swingSpeed: Math.random() * 0.008 + 0.003,
       color: petalColors[Math.floor(Math.random() * petalColors.length)],
-      opacity: Math.random() * 0.35 + 0.45,
+      opacity: Math.random() * 0.25 + 0.2,
       life: 0
     };
   }
 
   for (var i = 0; i < PETAL_COUNT; i++) {
     var p = createPetal();
-    p.y = Math.random() * H; // 初始分布在整个屏幕
+    p.y = Math.random() * H;
     petals.push(p);
   }
 
@@ -67,213 +144,37 @@
     ctx.translate(petal.x, petal.y);
     ctx.rotate(petal.angle);
     ctx.globalAlpha = petal.opacity;
-
-    var s = petal.size;
     ctx.fillStyle = petal.color;
 
-    // 绘制花瓣形状（椭圆 + 尖端）
+    var s = petal.size;
     ctx.beginPath();
     ctx.moveTo(0, -s * 0.5);
-    ctx.bezierCurveTo(s * 0.6, -s * 0.4, s * 0.5, s * 0.3, 0, s * 0.5);
-    ctx.bezierCurveTo(-s * 0.5, s * 0.3, -s * 0.6, -s * 0.4, 0, -s * 0.5);
+    ctx.bezierCurveTo(s * 0.55, -s * 0.35, s * 0.45, s * 0.3, 0, s * 0.5);
+    ctx.bezierCurveTo(-s * 0.45, s * 0.3, -s * 0.55, -s * 0.35, 0, -s * 0.5);
     ctx.fill();
-
-    // 花瓣脉络（细线）
-    ctx.strokeStyle = petal.color;
-    ctx.globalAlpha = petal.opacity * 0.3;
-    ctx.lineWidth = 0.5;
-    ctx.beginPath();
-    ctx.moveTo(0, -s * 0.35);
-    ctx.lineTo(0, s * 0.35);
-    ctx.stroke();
-
     ctx.restore();
   }
 
-  function animateSakura() {
+  function animate() {
     ctx.clearRect(0, 0, W, H);
-
     for (var i = petals.length - 1; i >= 0; i--) {
       var p = petals[i];
       p.life++;
-
-      // 下落 + 水平摆动
       p.y += p.speed;
-      p.x += Math.sin(p.swingPhase + p.life * p.swingSpeed) * 0.8;
+      p.x += Math.sin(p.swingPhase + p.life * p.swingSpeed) * 0.5;
       p.angle += p.spin;
-
       drawPetal(p);
-
-      // 超出屏幕底部 → 重置
-      if (p.y > H + 30) {
+      if (p.y > H + 20) {
         petals[i] = createPetal();
       }
     }
-
-    requestAnimationFrame(animateSakura);
+    requestAnimationFrame(animate);
   }
-  animateSakura();
+  animate();
 
   window.addEventListener("resize", function () {
     for (var i = 0; i < petals.length; i++) {
       petals[i].x = Math.random() * W;
     }
   });
-
-  /* ========================================
-     2. 精致 BGM 播放器重设计
-     ======================================== */
-
-  // 等待 DOM 和 starfield-bgm.js 播放器就绪
-  function initPlayer() {
-    var sfPlayer = document.querySelector(".sf-player");
-    var audio = document.getElementById("sfAudio");
-    var sfBtn = document.getElementById("sfBtn");
-
-    // 隐藏原始简陋播放器
-    if (sfPlayer) {
-      sfPlayer.style.cssText = "display:none!important;";
-    }
-    if (sfBtn) {
-      sfBtn.style.cssText = "display:none!important;";
-    }
-
-    if (!audio) return; // 没有 audio 元素就不创建播放器
-
-    // 读取配置
-    var sfConfig = window.SF_CONFIG || {};
-    var songTitle = sfConfig.title || "BGM";
-    var songArtist = sfConfig.artist || "";
-
-    // ── 创建精致播放器 HTML ──
-    var player = document.createElement("div");
-    player.className = "sakura-player";
-    player.innerHTML =
-      '<div class="sp-album">' +
-        '<div class="sp-disc" id="spDisc">' +
-          '<div class="sp-disc-hole"></div>' +
-        '</div>' +
-      '</div>' +
-      '<div class="sp-info">' +
-        '<div class="sp-title-row">' +
-          '<span class="sp-title">' + songTitle + '</span>' +
-          '<div class="sp-visualizer" id="spViz">' +
-            '<span></span><span></span><span></span><span></span><span></span>' +
-          '</div>' +
-        '</div>' +
-        '<div class="sp-artist">' + songArtist + '</div>' +
-        '<div class="sp-controls">' +
-          '<button class="sp-play-btn" id="spPlayBtn">' +
-            '<svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16"><path d="M8 5v14l11-7z"/></svg>' +
-          '</button>' +
-          '<div class="sp-progress-wrap">' +
-            '<div class="sp-progress-bar" id="spProgress"></div>' +
-          '</div>' +
-          '<button class="sp-vol-btn" id="spVolBtn">' +
-            '<svg viewBox="0 0 24 24" fill="currentColor" width="14" height="14"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3A4.5 4.5 0 0014 8.5v7a4.47 4.47 0 002.5-3.5z"/></svg>' +
-          '</button>' +
-        '</div>' +
-      '</div>';
-
-    document.body.appendChild(player);
-
-    // ── 获取元素引用 ──
-    var disc = document.getElementById("spDisc");
-    var playBtn = document.getElementById("spPlayBtn");
-    var vizBars = document.querySelectorAll("#spViz span");
-    var progressBar = document.getElementById("spProgress");
-    var volBtn = document.getElementById("spVolBtn");
-
-    // SVG 图标
-    var playIcon = '<svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16"><path d="M8 5v14l11-7z"/></svg>';
-    var pauseIcon = '<svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>';
-    var volOnIcon = '<svg viewBox="0 0 24 24" fill="currentColor" width="14" height="14"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3A4.5 4.5 0 0014 8.5v7a4.47 4.47 0 002.5-3.5z"/></svg>';
-    var volOffIcon = '<svg viewBox="0 0 24 24" fill="currentColor" width="14" height="14"><path d="M16.5 12A4.5 4.5 0 0014 8.5v2.09l2.41 2.41c.06-.31.09-.63.09-.97zM19 12c0 .94-.2 1.82-.54 2.64l1.51 1.51A8.796 8.796 0 0021 12c0-4.28-2.99-7.86-7-8.77v2.06c2.89.86 5 3.54 5 6.71zM4.27 3L3 4.27 7.73 9H3v6h4l5 5v-6.73l4.25 4.25c-.67.52-1.42.93-2.25 1.18v2.06a8.99 8.99 0 003.69-1.81L19.73 21 21 19.73l-9-9L4.27 3zM12 4L9.91 6.09 12 8.18V4z"/></svg>';
-
-    var isPlaying = false;
-    var isMuted = true; // 初始静音（和 starfield-bgm.js 一致）
-
-    function updatePlayState(playing) {
-      isPlaying = playing;
-      playBtn.innerHTML = playing ? pauseIcon : playIcon;
-      if (playing) {
-        player.classList.add("is-playing");
-      } else {
-        player.classList.remove("is-playing");
-      }
-    }
-
-    // ── 播放/暂停 ──
-    playBtn.addEventListener("click", function (e) {
-      e.stopPropagation();
-      if (audio.paused) {
-        audio.muted = false;
-        isMuted = false;
-        volBtn.innerHTML = volOnIcon;
-        audio.play().then(function () {
-          updatePlayState(true);
-        }).catch(function () {});
-      } else {
-        audio.pause();
-        updatePlayState(false);
-      }
-    });
-
-    // ── 音量切换 ──
-    volBtn.addEventListener("click", function (e) {
-      e.stopPropagation();
-      if (audio.muted || isMuted) {
-        audio.muted = false;
-        isMuted = false;
-        volBtn.innerHTML = volOnIcon;
-      } else {
-        audio.muted = true;
-        isMuted = true;
-        volBtn.innerHTML = volOffIcon;
-      }
-    });
-
-    // ── 进度条更新 ──
-    audio.addEventListener("timeupdate", function () {
-      if (audio.duration) {
-        var pct = (audio.currentTime / audio.duration) * 100;
-        progressBar.style.width = pct + "%";
-      }
-    });
-
-    // ── 音频事件 ──
-    audio.addEventListener("play", function () {
-      updatePlayState(true);
-    });
-    audio.addEventListener("pause", function () {
-      updatePlayState(false);
-    });
-
-    // ── 首次点击取消静音（兼容 starfield-bgm.js 逻辑） ──
-    function firstUnmute() {
-      if (audio.muted) {
-        audio.muted = false;
-        isMuted = false;
-        volBtn.innerHTML = volOnIcon;
-        if (audio.paused) {
-          audio.play().then(function () {
-            updatePlayState(true);
-          }).catch(function () {});
-        }
-      }
-      document.removeEventListener("click", firstUnmute);
-      document.removeEventListener("touchstart", firstUnmute);
-    }
-    document.addEventListener("click", firstUnmute);
-    document.addEventListener("touchstart", firstUnmute);
-  }
-
-  // 延迟初始化，确保 starfield-bgm.js 已执行
-  if (document.readyState === "complete") {
-    setTimeout(initPlayer, 100);
-  } else {
-    window.addEventListener("load", function () {
-      setTimeout(initPlayer, 100);
-    });
-  }
 })();

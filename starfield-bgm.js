@@ -9,7 +9,7 @@
 var CFG = window.SF_CONFIG || {};
 var STAR_COUNT    = CFG.stars      || 300;
 var MAX_METEORS   = CFG.maxMeteors || 10;
-var BGM_SRC       = CFG.bgmSrc    || 'bgm.mp3';
+var BGM_SRC       = CFG.bgmSrc    || '../bgm.mp3';
 var SONG_TITLE    = CFG.title     || 'A Promise From Distant Days';
 var SONG_ARTIST   = CFG.artist    || 'Silent Owl (Sergey Eybog) \u2014 Everlasting Summer OST';
 var VOLUME        = CFG.volume    || 0.6;

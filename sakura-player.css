@@ -1,334 +1,58 @@
-/*  sakura-player.css — 精致 BGM 播放器样式
- *  支持亮色（主页）和暗色（详情页）两种主题
- *  通过 body.dark-theme 类自动切换
+/*  sakura-tree.css — 樱花树枝装饰样式
+ *  仅用于主页，配合 sakura.js 使用
  */
 
-/* ====== 播放器容器 ====== */
-.sakura-player {
+/* ====== 樱花树容器 ====== */
+.sakura-tree-wrap {
   position: fixed;
-  bottom: 24px;
-  right: 24px;
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  padding: 14px 18px;
-  border-radius: 18px;
-  z-index: 9998;
-  max-width: 320px;
-  min-width: 260px;
-  backdrop-filter: blur(22px);
-  -webkit-backdrop-filter: blur(22px);
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
-  /* 默认亮色主题 */
-  background: rgba(255, 248, 252, 0.88);
-  border: 1px solid rgba(240, 180, 204, 0.3);
-  box-shadow:
-    0 8px 36px rgba(180, 120, 160, 0.18),
-    0 0 0 1px rgba(255, 255, 255, 0.5) inset;
+  top: -20px;
+  right: -30px;
+  width: min(55vw, 520px);
+  pointer-events: none;
+  z-index: 1;
+  transition: opacity 1.2s ease;
 }
 
-/* 暗色主题（详情页） */
-body.dark-theme .sakura-player {
-  background: rgba(18, 12, 35, 0.82);
-  border: 1px solid rgba(160, 140, 220, 0.2);
-  box-shadow:
-    0 8px 36px rgba(0, 0, 0, 0.45),
-    0 0 0 1px rgba(255, 255, 255, 0.06) inset;
+.sakura-tree-wrap svg {
+  width: 100%;
+  height: auto;
+  display: block;
+  filter: blur(0.3px);
 }
 
-.sakura-player:hover {
-  transform: translateY(-3px);
-  box-shadow:
-    0 12px 44px rgba(180, 120, 160, 0.25),
-    0 0 0 1px rgba(255, 255, 255, 0.5) inset;
+/* 微风轻摇动画 */
+@keyframes sakura-sway {
+  0%, 100% { transform: rotate(0deg) translateY(0); }
+  30%       { transform: rotate(0.3deg) translateY(-2px); }
+  70%       { transform: rotate(-0.2deg) translateY(1px); }
 }
 
-body.dark-theme .sakura-player:hover {
-  box-shadow:
-    0 12px 44px rgba(0, 0, 0, 0.55),
-    0 0 0 1px rgba(255, 255, 255, 0.08) inset;
+.sakura-tree-wrap svg {
+  animation: sakura-sway 8s ease-in-out infinite;
+  transform-origin: bottom right;
 }
 
-/* ====== 旋转唱片 ====== */
-.sp-album {
-  position: relative;
-  width: 52px;
-  height: 52px;
-  flex-shrink: 0;
-}
-
-.sp-disc {
+/* ====== 樱花 Canvas 花瓣层 ====== */
+#sakuraCanvas {
+  position: fixed;
+  inset: 0;
   width: 100%;
   height: 100%;
-  border-radius: 50%;
-  background: conic-gradient(
-    from 0deg,
-    #FFB7C5 0deg, #FF8FAB 40deg, #E8649E 80deg,
-    #FFB7C5 120deg, #FFA6C1 160deg, #FF8FAB 200deg,
-    #E8649E 240deg, #FFB7C5 280deg, #FFA6C1 320deg,
-    #FFB7C5 360deg
-  );
-  box-shadow:
-    0 3px 12px rgba(200, 100, 150, 0.35),
-    inset 0 0 18px rgba(255, 255, 255, 0.15);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  animation: sp-spin 4s linear infinite;
-  animation-play-state: paused;
-  transition: box-shadow 0.3s;
-}
-
-body.dark-theme .sp-disc {
-  background: conic-gradient(
-    from 0deg,
-    #6C5CE7 0deg, #8B5CF6 40deg, #A78BFA 80deg,
-    #6C5CE7 120deg, #7C6CF7 160deg, #8B5CF6 200deg,
-    #A78BFA 240deg, #6C5CE7 280deg, #7C6CF7 320deg,
-    #6C5CE7 360deg
-  );
-  box-shadow:
-    0 3px 12px rgba(108, 92, 231, 0.4),
-    inset 0 0 18px rgba(255, 255, 255, 0.08);
-}
-
-.sakura-player.is-playing .sp-disc {
-  animation-play-state: running;
-}
-
-@keyframes sp-spin {
-  to { transform: rotate(360deg); }
-}
-
-.sp-disc-hole {
-  width: 16px;
-  height: 16px;
-  border-radius: 50%;
-  background: rgba(255, 248, 252, 0.95);
-  border: 2px solid rgba(240, 180, 204, 0.5);
-  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.08);
-}
-
-body.dark-theme .sp-disc-hole {
-  background: rgba(18, 12, 35, 0.95);
-  border-color: rgba(140, 120, 200, 0.4);
-  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.3);
-}
-
-/* ====== 信息区 ====== */
-.sp-info {
-  flex: 1;
-  min-width: 0;
-}
-
-.sp-title-row {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-bottom: 3px;
-}
-
-.sp-title {
-  font-size: 13px;
-  font-weight: 600;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  color: #8B4570;
-  line-height: 1.3;
-}
-
-body.dark-theme .sp-title {
-  color: #E0D8F0;
-}
-
-.sp-artist {
-  font-size: 11px;
-  color: #B08898;
-  margin-bottom: 8px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  line-height: 1.3;
-}
-
-body.dark-theme .sp-artist {
-  color: #9080B0;
-}
-
-/* ====== 音频可视化条 ====== */
-.sp-visualizer {
-  display: flex;
-  align-items: flex-end;
-  gap: 2px;
-  height: 16px;
-  flex-shrink: 0;
-}
-
-.sp-visualizer span {
-  display: block;
-  width: 3px;
-  min-height: 3px;
-  border-radius: 2px;
-  background: linear-gradient(to top, #FF8FAB, #E8649E);
-  transition: height 0.15s ease;
-  height: 3px;
-}
-
-body.dark-theme .sp-visualizer span {
-  background: linear-gradient(to top, #8B5CF6, #6C5CE7);
-}
-
-.sakura-player.is-playing .sp-visualizer span:nth-child(1) { animation: sp-viz 0.6s ease-in-out infinite alternate; }
-.sakura-player.is-playing .sp-visualizer span:nth-child(2) { animation: sp-viz 0.45s ease-in-out infinite alternate 0.1s; }
-.sakura-player.is-playing .sp-visualizer span:nth-child(3) { animation: sp-viz 0.55s ease-in-out infinite alternate 0.2s; }
-.sakura-player.is-playing .sp-visualizer span:nth-child(4) { animation: sp-viz 0.5s ease-in-out infinite alternate 0.05s; }
-.sakura-player.is-playing .sp-visualizer span:nth-child(5) { animation: sp-viz 0.65s ease-in-out infinite alternate 0.15s; }
-
-@keyframes sp-viz {
-  0%   { height: 3px; }
-  100% { height: 16px; }
-}
-
-/* ====== 控制栏 ====== */
-.sp-controls {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.sp-play-btn,
-.sp-vol-btn {
-  border: none;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0;
-  transition: transform 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
-  outline: none;
-}
-
-.sp-play-btn {
-  width: 30px;
-  height: 30px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, #FF8FAB 0%, #E8649E 100%);
-  color: #fff;
-  flex-shrink: 0;
-  box-shadow: 0 2px 8px rgba(232, 100, 158, 0.3);
-}
-
-body.dark-theme .sp-play-btn {
-  background: linear-gradient(135deg, #8B5CF6 0%, #6C5CE7 100%);
-  box-shadow: 0 2px 8px rgba(108, 92, 231, 0.4);
-}
-
-.sp-play-btn:hover {
-  transform: scale(1.1);
-  box-shadow: 0 3px 12px rgba(232, 100, 158, 0.45);
-}
-
-body.dark-theme .sp-play-btn:hover {
-  box-shadow: 0 3px 12px rgba(108, 92, 231, 0.55);
-}
-
-.sp-vol-btn {
-  width: 24px;
-  height: 24px;
-  border-radius: 50%;
-  background: transparent;
-  color: #B08898;
-  flex-shrink: 0;
-}
-
-body.dark-theme .sp-vol-btn {
-  color: #9080B0;
-}
-
-.sp-vol-btn:hover {
-  color: #E8649E;
-  transform: scale(1.1);
-}
-
-body.dark-theme .sp-vol-btn:hover {
-  color: #8B5CF6;
-}
-
-/* ====== 进度条 ====== */
-.sp-progress-wrap {
-  flex: 1;
-  height: 4px;
-  background: rgba(240, 180, 204, 0.3);
-  border-radius: 2px;
-  overflow: hidden;
-  cursor: pointer;
-  transition: height 0.2s;
-}
-
-body.dark-theme .sp-progress-wrap {
-  background: rgba(140, 120, 200, 0.2);
-}
-
-.sp-progress-wrap:hover {
-  height: 6px;
-}
-
-.sp-progress-bar {
-  height: 100%;
-  width: 0%;
-  border-radius: 2px;
-  background: linear-gradient(90deg, #FF8FAB 0%, #E8649E 100%);
-  transition: width 0.2s linear;
-  position: relative;
-}
-
-body.dark-theme .sp-progress-bar {
-  background: linear-gradient(90deg, #8B5CF6 0%, #6C5CE7 100%);
-}
-
-.sp-progress-bar::after {
-  content: "";
-  position: absolute;
-  right: -4px;
-  top: 50%;
-  transform: translateY(-50%) scale(0);
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-  background: #E8649E;
-  box-shadow: 0 0 6px rgba(232, 100, 158, 0.5);
-  transition: transform 0.2s;
-}
-
-body.dark-theme .sp-progress-bar::after {
-  background: #6C5CE7;
-  box-shadow: 0 0 6px rgba(108, 92, 231, 0.5);
-}
-
-.sp-progress-wrap:hover .sp-progress-bar::after {
-  transform: translateY(-50%) scale(1);
+  pointer-events: none;
+  z-index: 2;
 }
 
 /* ====== 响应式 ====== */
+@media (max-width: 720px) {
+  .sakura-tree-wrap {
+    width: 65vw;
+    top: -10px;
+    right: -15px;
+  }
+}
+
 @media (max-width: 480px) {
-  .sakura-player {
-    bottom: 12px;
-    right: 12px;
-    left: 12px;
-    max-width: none;
-    padding: 10px 14px;
-    gap: 10px;
-  }
-  .sp-album {
-    width: 40px;
-    height: 40px;
-  }
-  .sp-disc-hole {
-    width: 12px;
-    height: 12px;
-  }
-  .sp-title {
-    font-size: 12px;
+  .sakura-tree-wrap {
+    width: 75vw;
   }
 }

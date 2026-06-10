@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>YouTube Pain Point Pipeline | 项目详情</title>
   <link rel="stylesheet" href="../style.css" />
-  <link rel="stylesheet" href="../sakura-player.css" />
   <style>
     .detail-shell { position:relative; z-index:1; max-width:1020px; margin:0 auto; padding:36px 24px 60px; }
     .back-bar { margin-bottom:28px; }
@@ -181,7 +180,7 @@
     ::selection { background: rgba(168,124,219,0.4); color: #E0D8F0; }
   </style>
 </head>
-<body class="dark-theme">
+<body>
 
   <!-- ====== Mouse trail canvas ====== -->
   <canvas id="trailCanvas" aria-hidden="true"></canvas>
@@ -721,6 +720,5 @@ uvicorn main:app --reload --host <span class="num">127.0.0.1</span> --port <span
   })();
   </script>
   <script src="../starfield-bgm.js"></script>
-  <script src="../sakura.js"></script>
 </body>
 </html>
