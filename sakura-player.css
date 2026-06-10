@@ -1,34 +1,35 @@
-/*  sakura-tree.css — 樱花树枝装饰样式
+/*  sakura-player.css — 樱花树枝装饰样式
  *  仅用于主页，配合 sakura.js 使用
  */
 
 /* ====== 樱花树容器 ====== */
 .sakura-tree-wrap {
   position: fixed;
-  top: -20px;
-  right: -30px;
-  width: min(55vw, 520px);
+  top: -30px;
+  right: -40px;
+  width: min(60vw, 580px);
   pointer-events: none;
   z-index: 1;
-  transition: opacity 1.2s ease;
+  transition: opacity 1.5s ease;
 }
 
 .sakura-tree-wrap svg {
   width: 100%;
   height: auto;
   display: block;
-  filter: blur(0.3px);
+  filter: drop-shadow(0 2px 8px rgba(200, 150, 170, 0.08));
 }
 
-/* 微风轻摇动画 */
+/* 微风轻摇动画 — 非常缓慢，几乎察觉不到 */
 @keyframes sakura-sway {
   0%, 100% { transform: rotate(0deg) translateY(0); }
-  30%       { transform: rotate(0.3deg) translateY(-2px); }
-  70%       { transform: rotate(-0.2deg) translateY(1px); }
+  25%       { transform: rotate(0.15deg) translateY(-1px); }
+  50%       { transform: rotate(0deg) translateY(0.5px); }
+  75%       { transform: rotate(-0.1deg) translateY(-0.5px); }
 }
 
 .sakura-tree-wrap svg {
-  animation: sakura-sway 8s ease-in-out infinite;
+  animation: sakura-sway 12s ease-in-out infinite;
   transform-origin: bottom right;
 }
 
@@ -45,14 +46,16 @@
 /* ====== 响应式 ====== */
 @media (max-width: 720px) {
   .sakura-tree-wrap {
-    width: 65vw;
-    top: -10px;
-    right: -15px;
+    width: 70vw;
+    top: -15px;
+    right: -20px;
   }
 }
 
 @media (max-width: 480px) {
   .sakura-tree-wrap {
-    width: 75vw;
+    width: 80vw;
+    top: -10px;
+    right: -10px;
   }
 }

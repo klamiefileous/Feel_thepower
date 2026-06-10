@@ -1,13 +1,13 @@
 /* ============================================
    GitHub Pages Portfolio — Sakura Theme
-   Cherry blossom petals + fresh minimalist
+   Pink-blue blend + cherry blossom
    ============================================ */
 
 :root {
-  /* Sakura palette — soft, fresh, elegant */
-  --lavender:       #F5EEF8;
-  --soft-pink:      #FFF5F8;
-  --sky-blue:       #E0F0FF;
+  /* Pink-blue harmony palette */
+  --lavender:       #F0EAF6;
+  --soft-pink:      #FFF0F5;
+  --sky-blue:       #E4F0FF;
   --cream:          #FFFAF5;
   --mint:           #E8F8EE;
   --peach:          #FFE8D0;
@@ -36,7 +36,7 @@
 /* ---------- Page body ---------- */
 body {
   min-height: 100vh;
-  background: linear-gradient(160deg, #F5EEF8 0%, #FFF5F8 25%, #FFE4EC 50%, #E8F4FF 75%, #FAF5FC 100%);
+  background: linear-gradient(145deg, #F4E4F0 0%, #F8ECF6 12%, #F0EAF8 28%, #EAF0FC 48%, #E4F0FF 62%, #ECF2FC 78%, #F6ECF4 100%);
   color: var(--text-dark);
   overflow-x: hidden;
   position: relative;
