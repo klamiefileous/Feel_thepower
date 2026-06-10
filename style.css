@@ -37,16 +37,16 @@
 body {
   min-height: 100vh;
   background:
-    /* 晨光光晕 — 极淡雾气漂移 */
-    radial-gradient(ellipse 80% 60% at 25% 30%, rgba(220,238,252,0.18) 0%, transparent 70%),
-    radial-gradient(ellipse 70% 50% at 75% 65%, rgba(215,235,250,0.15) 0%, transparent 70%),
-    /* 薄雾层 — 大面积柔和白 */
-    radial-gradient(ellipse 120% 80% at 50% 20%, rgba(255,255,255,0.55) 0%, transparent 60%),
-    radial-gradient(ellipse 100% 70% at 80% 80%, rgba(248,252,255,0.40) 0%, transparent 55%),
-    /* 留白呼吸区 — 左下角更白 */
-    radial-gradient(ellipse 60% 50% at 10% 90%, rgba(255,255,255,0.60) 0%, transparent 70%),
-    /* 基础浅蓝渐变 — 近乎白色的微蓝 */
-    linear-gradient(145deg, #F5FAFE 0%, #F2F8FD 15%, #EEF6FC 30%, #EBF4FB 50%, #E8F2FA 65%, #EDF6FC 80%, #F6FBFE 100%);
+    /* 极淡暖光漂移 */
+    radial-gradient(ellipse 80% 60% at 25% 30%, rgba(255,252,248,0.30) 0%, transparent 70%),
+    radial-gradient(ellipse 70% 50% at 75% 65%, rgba(252,250,255,0.25) 0%, transparent 70%),
+    /* 柔和白雾 */
+    radial-gradient(ellipse 120% 80% at 50% 20%, rgba(255,255,255,0.60) 0%, transparent 60%),
+    radial-gradient(ellipse 100% 70% at 80% 80%, rgba(255,255,255,0.45) 0%, transparent 55%),
+    /* 留白 */
+    radial-gradient(ellipse 60% 50% at 10% 90%, rgba(255,255,255,0.65) 0%, transparent 70%),
+    /* 基础白色透明渐变 */
+    linear-gradient(145deg, #FDFDFE 0%, #FCFCFD 15%, #FBFBFC 30%, #FAFBFC 50%, #F9FAFC 65%, #FBFCFD 80%, #FDFEFE 100%);
   background-size: 200% 200%, 200% 200%, 100% 100%, 100% 100%, 100% 100%, 100% 100%;
   animation: fogDrift 28s ease-in-out infinite;
   color: var(--text-dark);

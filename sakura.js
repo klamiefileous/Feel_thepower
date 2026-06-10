@@ -385,13 +385,13 @@
     frame++;
     updateWind();
 
-    // ── 层0: 水面底色洗 (水雾般若有若无) ──
+    // ── 层0: 水面色洗 (白色透明 · 水的本质) ──
     var washDefs = [
-      [W * 0.10, H * 0.22, W * 0.44, "210,238,248", 0.10],  // 极淡水蓝
-      [W * 0.18, H * 0.55, W * 0.40, "200,235,240", 0.09],  // 极淡冰蓝
-      [W * 0.06, H * 0.82, W * 0.36, "215,240,235", 0.08],  // 极淡薄荷
-      [W * 0.22, H * 0.08, W * 0.30, "205,238,232", 0.07],  // 极淡青绿
-      [W * 0.02, H * 0.45, W * 0.32, "220,240,242", 0.06]   // 极淡水色
+      [W * 0.10, H * 0.22, W * 0.44, "245,250,252", 0.08],  // 极淡白蓝
+      [W * 0.18, H * 0.55, W * 0.40, "242,248,250", 0.07],  // 极淡冰白
+      [W * 0.06, H * 0.82, W * 0.36, "248,252,250", 0.06],  // 极淡白绿
+      [W * 0.22, H * 0.08, W * 0.30, "245,250,248", 0.05],  // 极淡白青
+      [W * 0.02, H * 0.45, W * 0.32, "250,252,253", 0.05]   // 近白
     ];
     washDefs.forEach(function (w) {
       var wg = X.createRadialGradient(w[0] * dpr, w[1] * dpr, 0, w[0] * dpr, w[1] * dpr, w[2] * dpr);
@@ -411,7 +411,7 @@
     for (var wi = 0; wi < waveLines; wi++) {
       var wy = (wi / waveLines) * H;
       var wyBase = wy * dpr;
-      var wAlpha = 0.07 + Math.sin(t * 0.4 + wi * 0.4) * 0.04;
+      var wAlpha = 0.04 + Math.sin(t * 0.4 + wi * 0.4) * 0.025;
       X.beginPath();
       for (var wx = 0; wx < wlPx; wx += 3 * dpr) {
         var wyOff = Math.sin(wx / (80 * dpr) + t + wi * 0.6) * 1.5 * dpr
@@ -419,7 +419,7 @@
         if (wx === 0) X.moveTo(wx, wyBase + wyOff);
         else X.lineTo(wx, wyBase + wyOff);
       }
-      X.strokeStyle = "rgba(80,195,210," + wAlpha.toFixed(3) + ")";
+      X.strokeStyle = "rgba(160,210,218," + wAlpha.toFixed(3) + ")";
       X.lineWidth = (0.6 + Math.sin(t * 0.3 + wi) * 0.3) * dpr;
       X.stroke();
     }
