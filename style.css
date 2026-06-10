@@ -1,26 +1,26 @@
 /* ============================================
    GitHub Pages Portfolio — Sakura Theme
-   Pink-blue blend + cherry blossom
+   Light blue sky + cherry blossom
    ============================================ */
 
 :root {
-  /* Pink-blue harmony palette */
-  --lavender:       #F0EAF6;
+  /* Light blue + sakura palette */
+  --sky-light:      #EAF4FC;
+  --sky-blue:       #D4ECFC;
+  --sky-deep:       #B8DEFA;
   --soft-pink:      #FFF0F5;
-  --sky-blue:       #E4F0FF;
   --cream:          #FFFAF5;
   --mint:           #E8F8EE;
-  --peach:          #FFE8D0;
   --sakura-light:   #FFE4EC;
   --sakura:         #FFB7C5;
   --sakura-deep:    #E8649E;
   --branch-brown:   #8B6F5E;
-  --text-dark:      #3D2E5C;
-  --text-mid:       #6B5B8A;
-  --text-light:     #9A8BB5;
-  --glass-bg:       rgba(255, 255, 255, 0.68);
-  --glass-border:   rgba(220, 200, 235, 0.28);
-  --glass-shadow:   rgba(200, 175, 230, 0.10);
+  --text-dark:      #2C4A6E;
+  --text-mid:       #4A6FA5;
+  --text-light:     #7B9CC0;
+  --glass-bg:       rgba(255, 255, 255, 0.72);
+  --glass-border:   rgba(180, 210, 240, 0.30);
+  --glass-shadow:   rgba(150, 190, 230, 0.12);
   --accent-purple:  #A87CDB;
   --accent-cyan:    #7EC8E3;
   --accent-pink:    #FFB7C5;
@@ -37,16 +37,16 @@
 body {
   min-height: 100vh;
   background:
-    /* 晨光光晕 — 缓慢漂移 */
-    radial-gradient(ellipse 80% 60% at 25% 30%, rgba(255,240,230,0.25) 0%, transparent 70%),
-    radial-gradient(ellipse 70% 50% at 75% 65%, rgba(230,235,255,0.2) 0%, transparent 70%),
-    /* 薄雾层 — 柔和径向 */
-    radial-gradient(ellipse 120% 80% at 50% 20%, rgba(255,255,255,0.45) 0%, transparent 60%),
-    radial-gradient(ellipse 100% 70% at 80% 80%, rgba(255,250,255,0.35) 0%, transparent 55%),
+    /* 晨光光晕 — 蓝色调漂移 */
+    radial-gradient(ellipse 80% 60% at 25% 30%, rgba(200,225,250,0.30) 0%, transparent 70%),
+    radial-gradient(ellipse 70% 50% at 75% 65%, rgba(180,215,245,0.25) 0%, transparent 70%),
+    /* 薄雾层 — 柔和白色径向 */
+    radial-gradient(ellipse 120% 80% at 50% 20%, rgba(255,255,255,0.50) 0%, transparent 60%),
+    radial-gradient(ellipse 100% 70% at 80% 80%, rgba(240,248,255,0.35) 0%, transparent 55%),
     /* 留白呼吸区 — 左下角更白 */
-    radial-gradient(ellipse 60% 50% at 10% 90%, rgba(255,255,255,0.5) 0%, transparent 70%),
-    /* 基础粉蓝渐变 */
-    linear-gradient(145deg, #F4E4F0 0%, #F8ECF6 12%, #F0EAF8 28%, #EAF0FC 48%, #E4F0FF 62%, #ECF2FC 78%, #F6ECF4 100%);
+    radial-gradient(ellipse 60% 50% at 10% 90%, rgba(255,255,255,0.55) 0%, transparent 70%),
+    /* 基础浅蓝渐变 */
+    linear-gradient(145deg, #E8F4FD 0%, #E0F0FC 15%, #D8ECFB 30%, #D0E8FA 50%, #C8E4F8 65%, #D4ECFC 80%, #E4F2FE 100%);
   background-size: 200% 200%, 200% 200%, 100% 100%, 100% 100%, 100% 100%, 100% 100%;
   animation: fogDrift 28s ease-in-out infinite;
   color: var(--text-dark);

@@ -3,12 +3,12 @@
  *  风韵节奏：阵风4-6s → 静息8-12s → 循环
  *  景深：远枝模糊，近枝清晰
  *  用法：<script src="sakura.js"></script>
- *  配置：window.SAKURA_CONFIG = { petals: 25, opacity: 0.92 }
+ *  配置：window.SAKURA_CONFIG = { petals: 50, opacity: 1.0 }
  */
 (function () {
   "use strict";
   var CFG = window.SAKURA_CONFIG || {};
-  var MAX_PETALS = CFG.petals || 25;
+  var MAX_PETALS = CFG.petals || 50;
   var GLOBAL_ALPHA = CFG.opacity || 1.0;
 
   /* ═══════════ Canvas Setup ═══════════ */
