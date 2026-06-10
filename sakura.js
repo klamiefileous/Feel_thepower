@@ -9,7 +9,7 @@
   "use strict";
   var CFG = window.SAKURA_CONFIG || {};
   var MAX_PETALS = CFG.petals || 25;
-  var GLOBAL_ALPHA = CFG.opacity || 0.92;
+  var GLOBAL_ALPHA = CFG.opacity || 1.0;
 
   /* ═══════════ Canvas Setup ═══════════ */
   var C = document.createElement("canvas");
@@ -74,8 +74,8 @@
   function spawnRipple(rx, ry, strength) {
     if (ripples.length > 15) ripples.shift();
     ripples.push({
-      x: rx, y: ry, r: 0, maxR: (25 + Math.random() * 35) * (strength || 1),
-      alpha: 0.18 + Math.random() * 0.08, speed: 0.3 + Math.random() * 0.2, phase: 0
+      x: rx, y: ry, r: 0, maxR: (60 + Math.random() * 60) * (strength || 1),
+      alpha: 0.50 + Math.random() * 0.20, speed: 0.15 + Math.random() * 0.10, phase: 0
     });
   }
 
@@ -251,7 +251,7 @@
       swingFreq: 0.008 + Math.random() * 0.01,
       swingPhase: Math.random() * Math.PI * 2,
       color: petalColors[Math.floor(Math.random() * petalColors.length)],
-      alpha: 0.25 + Math.random() * 0.25,
+      alpha: 0.70 + Math.random() * 0.20,
       pause: 0,
       paused: false,
       life: 0,
@@ -269,9 +269,9 @@
 
   /* ═══════════ 近景虚化花瓣 ═══════════ */
   var fgPetals = [
-    { x: 0.05, y: 0.85, size: 55, rot: 0.3, alpha: 0.06, drift: 0.0003 },
-    { x: 0.92, y: 0.15, size: 40, rot: -0.5, alpha: 0.04, drift: -0.0002 },
-    { x: 0.15, y: 0.1, size: 35, rot: 1.2, alpha: 0.035, drift: 0.0004 }
+    { x: 0.05, y: 0.85, size: 55, rot: 0.3, alpha: 0.20, drift: 0.0003 },
+    { x: 0.92, y: 0.15, size: 40, rot: -0.5, alpha: 0.15, drift: -0.0002 },
+    { x: 0.15, y: 0.1, size: 35, rot: 1.2, alpha: 0.18, drift: 0.0004 }
   ];
 
   /* ═══════════ 绘制函数 ═══════════ */
@@ -349,19 +349,29 @@
     X.restore();
   }
 
-  // 飘落花瓣形状
+  // 飘落花瓣形状（含白边增强对比度）
   function drawFallingPetal(p) {
     X.save();
     X.translate(p.x * dpr, p.y * dpr);
     X.rotate(p.angle);
     X.globalAlpha = p.alpha;
-    X.fillStyle = p.color;
     var s = p.size * dpr;
+    // 淡阴影（增加立体感）
+    X.shadowColor = "rgba(180,140,155,0.35)";
+    X.shadowBlur = 2.5 * dpr;
+    X.shadowOffsetX = 1 * dpr;
+    X.shadowOffsetY = 1 * dpr;
+    X.fillStyle = p.color;
     X.beginPath();
     X.moveTo(0, -s * 0.5);
     X.bezierCurveTo(s * 0.4, -s * 0.08, s * 0.32, s * 0.25, 0, s * 0.4);
     X.bezierCurveTo(-s * 0.32, s * 0.25, -s * 0.4, -s * 0.08, 0, -s * 0.5);
     X.fill();
+    // 白边描边
+    X.shadowColor = "transparent";
+    X.strokeStyle = "rgba(255,255,255,0.55)";
+    X.lineWidth = 0.6 * dpr;
+    X.stroke();
     X.restore();
   }
 
@@ -375,13 +385,13 @@
     frame++;
     updateWind();
 
-    // ── 层0: 水面底色洗 (青碧/水色/深薄荷) ──
+    // ── 层0: 水面底色洗 (清澈透明 · 干净水色) ──
     var washDefs = [
-      [W * 0.10, H * 0.22, W * 0.42, "140,210,200", 0.20],  // 青碧
-      [W * 0.18, H * 0.55, W * 0.38, "170,210,230", 0.18],  // 水色浅蓝
-      [W * 0.06, H * 0.82, W * 0.34, "190,200,225", 0.15],  // 暮水紫
-      [W * 0.22, H * 0.08, W * 0.28, "160,220,200", 0.14],  // 嫩芽薄荷
-      [W * 0.02, H * 0.45, W * 0.30, "180,220,210", 0.12]   // 翡翠水色
+      [W * 0.10, H * 0.22, W * 0.44, "120,205,225", 0.26],  // 清澈水蓝
+      [W * 0.18, H * 0.55, W * 0.40, "100,210,220", 0.24],  // 薄荷冰蓝
+      [W * 0.06, H * 0.82, W * 0.36, "150,220,210", 0.22],  // 薄荷碧绿
+      [W * 0.22, H * 0.08, W * 0.30, "130,220,210", 0.20],  // 冰川绿
+      [W * 0.02, H * 0.45, W * 0.32, "160,225,230", 0.18]   // 浅青水色
     ];
     washDefs.forEach(function (w) {
       var wg = X.createRadialGradient(w[0] * dpr, w[1] * dpr, 0, w[0] * dpr, w[1] * dpr, w[2] * dpr);
@@ -401,7 +411,7 @@
     for (var wi = 0; wi < waveLines; wi++) {
       var wy = (wi / waveLines) * H;
       var wyBase = wy * dpr;
-      var wAlpha = 0.025 + Math.sin(t * 0.4 + wi * 0.4) * 0.015;
+      var wAlpha = 0.07 + Math.sin(t * 0.4 + wi * 0.4) * 0.04;
       X.beginPath();
       for (var wx = 0; wx < wlPx; wx += 3 * dpr) {
         var wyOff = Math.sin(wx / (80 * dpr) + t + wi * 0.6) * 1.5 * dpr
@@ -409,7 +419,7 @@
         if (wx === 0) X.moveTo(wx, wyBase + wyOff);
         else X.lineTo(wx, wyBase + wyOff);
       }
-      X.strokeStyle = "rgba(140,210,205," + wAlpha.toFixed(3) + ")";
+      X.strokeStyle = "rgba(80,195,210," + wAlpha.toFixed(3) + ")";
       X.lineWidth = (0.6 + Math.sin(t * 0.3 + wi) * 0.3) * dpr;
       X.stroke();
     }
@@ -417,10 +427,10 @@
     for (var si = 0; si < 4; si++) {
       var sy = (0.15 + si * 0.22 + Math.sin(t * 0.2 + si) * 0.03) * H;
       var sg = X.createLinearGradient(0, sy * dpr, wlPx * 0.85, sy * dpr);
-      sg.addColorStop(0, "rgba(200,235,230,0)");
-      sg.addColorStop(0.25, "rgba(200,235,230,0.04)");
-      sg.addColorStop(0.55, "rgba(210,240,235,0.06)");
-      sg.addColorStop(1, "rgba(200,235,230,0)");
+      sg.addColorStop(0, "rgba(180,240,245,0)");
+      sg.addColorStop(0.25, "rgba(180,240,245,0.08)");
+      sg.addColorStop(0.55, "rgba(190,245,250,0.12)");
+      sg.addColorStop(1, "rgba(180,240,245,0)");
       X.fillStyle = sg;
       X.fillRect(0, (sy - 10) * dpr, wlPx, 20 * dpr);
     }
@@ -557,14 +567,14 @@
       // 主涟漪
       X.beginPath();
       X.arc(rp.x * dpr, rp.y * dpr, rp.r, 0, Math.PI * 2);
-      X.strokeStyle = "rgba(150,215,210," + (rp.alpha * fade).toFixed(3) + ")";
-      X.lineWidth = (1.2 * fade + 0.2) * dpr;
+      X.strokeStyle = "rgba(70,200,215," + (rp.alpha * fade).toFixed(3) + ")";
+      X.lineWidth = (2.0 * fade + 0.5) * dpr;
       X.stroke();
       // 内侧副涟漪
       if (rp.r > 6 * dpr) {
         X.beginPath();
         X.arc(rp.x * dpr, rp.y * dpr, rp.r * 0.55, 0, Math.PI * 2);
-        X.strokeStyle = "rgba(170,225,220," + (rp.alpha * fade * 0.4).toFixed(3) + ")";
+        X.strokeStyle = "rgba(90,215,225," + (rp.alpha * fade * 0.5).toFixed(3) + ")";
         X.lineWidth = 0.6 * dpr;
         X.stroke();
       }
@@ -572,7 +582,7 @@
       if (rp.r > 12 * dpr) {
         X.beginPath();
         X.arc(rp.x * dpr, rp.y * dpr, rp.r * 1.25, 0, Math.PI * 2);
-        X.strokeStyle = "rgba(140,205,200," + (rp.alpha * fade * 0.12).toFixed(3) + ")";
+        X.strokeStyle = "rgba(60,190,205," + (rp.alpha * fade * 0.2).toFixed(3) + ")";
         X.lineWidth = 0.4 * dpr;
         X.stroke();
       }
