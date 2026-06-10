@@ -107,12 +107,85 @@
       .module-grid { grid-template-columns:1fr; }
       .dual-path { grid-template-columns:1fr; }
     }
+
+    /* ====== Dark theme overrides for starfield background ====== */
+    :root {
+      --text-dark: #E0D8F0;
+      --text-mid: #B0A0CC;
+      --text-light: #7A6B98;
+      --glass-bg: rgba(20, 15, 40, 0.55);
+      --glass-border: rgba(140, 120, 200, 0.22);
+      --glass-shadow: rgba(0, 0, 0, 0.35);
+    }
+    body { background: #050510; color: #E0D8F0; }
+    .glass {
+      background: rgba(20, 15, 40, 0.55);
+      border-color: rgba(140, 120, 200, 0.22);
+      box-shadow: 0 4px 28px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.08);
+    }
+    .glass::before { background: linear-gradient(90deg, #A87CDB, #F2A7C3, #7EC8E3); }
+    .detail-hero h1 {
+      background: linear-gradient(135deg, #C9A7EB, #F5B8D1, #7EC8E3);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+    }
+    .detail-hero .subtitle { color: #B0A0CC; }
+    .eyebrow {
+      background: linear-gradient(135deg, rgba(168,124,219,0.28), rgba(242,167,195,0.28));
+      color: #C9A7EB; border-color: rgba(168,124,219,0.35);
+    }
+    .badge--purple { background: rgba(168,124,219,0.2); color: #C9A7EB; border-color: rgba(168,124,219,0.3); }
+    .badge--pink   { background: rgba(242,167,195,0.2); color: #F5B8D1; border-color: rgba(242,167,195,0.3); }
+    .badge--cyan   { background: rgba(126,200,227,0.2); color: #7EC8E3; border-color: rgba(126,200,227,0.3); }
+    .badge--gold   { background: rgba(245,197,106,0.2); color: #F5C56A; border-color: rgba(245,197,106,0.3); }
+    .sec-title { color: #E0D8F0; }
+    .sec-icon { opacity: 0.85; }
+    .arch-node--purple { background: rgba(168,124,219,0.18); color: #C9A7EB; border-color: rgba(168,124,219,0.3); }
+    .arch-node--pink   { background: rgba(242,167,195,0.18); color: #F5B8D1; border-color: rgba(242,167,195,0.3); }
+    .arch-node--cyan   { background: rgba(126,200,227,0.18); color: #7EC8E3; border-color: rgba(126,200,227,0.3); }
+    .arch-node--gold   { background: rgba(245,197,106,0.18); color: #F5C56A; border-color: rgba(245,197,106,0.3); }
+    .arch-arrow { color: #7A6B98; }
+    .file-tree { background: rgba(255,255,255,0.04); border-color: rgba(140,120,200,0.15); color: #B0A0CC; }
+    .file-tree .dir { color: #C9A7EB; }
+    .file-tree .file { color: #B0A0CC; }
+    .file-tree .comment { color: #6A5B88; }
+    .code-block { background: rgba(20,10,40,0.92); border-color: rgba(168,124,219,0.2); }
+    .csv-table th { background: rgba(168,124,219,0.15); color: #E0D8F0; border-color: rgba(140,120,200,0.2); }
+    .csv-table td { color: #B0A0CC; border-color: rgba(140,120,200,0.12); }
+    .csv-table code { background: rgba(168,124,219,0.15); color: #C9A7EB; }
+    .env-table th { background: rgba(245,197,106,0.12); color: #E0D8F0; border-color: rgba(245,197,106,0.18); }
+    .env-table td { color: #B0A0CC; border-color: rgba(140,120,200,0.1); }
+    .env-table code { background: rgba(245,197,106,0.12); color: #F5C56A; }
+    .env-required { background: rgba(242,167,195,0.18); color: #F5B8D1; }
+    .env-optional { background: rgba(126,200,227,0.15); color: #7EC8E3; }
+    .p-step { background: rgba(255,255,255,0.04); border-color: rgba(140,120,200,0.12); }
+    .p-step:hover { box-shadow: 0 4px 16px rgba(168,124,219,0.12); }
+    .p-step-body h4 { color: #E0D8F0; }
+    .p-step-body p  { color: #B0A0CC; }
+    .mod-card { background: rgba(255,255,255,0.05); border-color: rgba(140,120,200,0.12); }
+    .mod-card:hover { box-shadow: 0 8px 24px rgba(168,124,219,0.12); }
+    .mod-card h4 { color: #E0D8F0; }
+    .mod-card p  { color: #B0A0CC; }
+    .path-card { background: rgba(255,255,255,0.05); border-color: rgba(140,120,200,0.12); }
+    .path-card h4 { color: #E0D8F0; }
+    .path-card p { color: #B0A0CC; }
+    .path-card ul { color: #B0A0CC; }
+    .path-tag--a { color: #C9A7EB; }
+    .path-tag--b { color: #F5B8D1; }
+    .btn-secondary { background: rgba(255,255,255,0.08); color: #C9A7EB; border-color: rgba(140,120,200,0.25); }
+    .btn-secondary:hover { background: rgba(255,255,255,0.15); border-color: rgba(168,124,219,0.4); }
+    .link-button { background: rgba(255,255,255,0.08); color: #C9A7EB; border-color: rgba(140,120,200,0.25); }
+    .link-button:hover { background: rgba(255,255,255,0.15); border-color: rgba(168,124,219,0.4); }
+    .footer { border-color: rgba(140,120,200,0.15); }
+    .footer p { color: #7A6B98; }
+    .mascot-wrapper { right: auto; left: 28px; filter: drop-shadow(0 8px 20px rgba(100,80,160,0.4)); }
+    .dragon-bg { display: none; }
+    ::-webkit-scrollbar-track { background: rgba(20,10,40,0.5); }
+    ::selection { background: rgba(168,124,219,0.4); color: #E0D8F0; }
   </style>
 </head>
 <body>
 
-  <div class="stars-layer" id="starsLayer" aria-hidden="true"></div>
-  <img class="dragon-bg" src="../images/kali-dragon-bg.png" alt="" aria-hidden="true" />
+  <!-- ====== Mouse trail canvas ====== -->
   <canvas id="trailCanvas" aria-hidden="true"></canvas>
 
   <div class="detail-shell">
@@ -519,7 +592,7 @@ html_desc = <span class="fn">generate_description</span>(title, description, cat
 <span class="cm"># → "&lt;h3&gt;Features&lt;/h3&gt;&lt;ul&gt;&lt;li&gt;...&lt;/li&gt;&lt;/ul&gt;..."</span></div>
 
       <div style="margin-top:18px;padding:16px 20px;border-radius:14px;background:rgba(168,124,219,0.1);border:1px solid rgba(168,124,219,0.2);">
-        <p style="margin:0;font-size:0.88rem;color:#5A3D8A;">
+        <p style="margin:0;font-size:0.88rem;color:#C9A7EB;">
           <strong>本地运行优势：</strong>使用 Ollama + llama3.1:8b 完全本地运行，无需付费 API。每产品 3 次 LLM 调用（分类 + 标题 + 描述），处理数百个商品无额外成本。temperature=0.7 在创意性和稳定性之间取得平衡。
         </p>
       </div>
@@ -623,19 +696,19 @@ python shopify_serper.py</div>
 <span class="cm"># 5. 数百个商品将自动创建到店铺中</span></div>
 
       <div style="margin-top:18px;padding:16px 20px;border-radius:14px;background:rgba(245,197,106,0.12);border:1px solid rgba(245,197,106,0.25);">
-        <p style="margin:0;font-size:0.88rem;color:#8B6914;">
+        <p style="margin:0;font-size:0.88rem;color:#F5C56A;">
           <strong>依赖清单：</strong>playwright, beautifulsoup4, requests, pandas（路径 A）；额外需 requests（路径 B，serper API 调用）。无 FastAPI/Web 服务器，纯脚本运行。
         </p>
       </div>
 
       <div style="margin-top:12px;padding:16px 20px;border-radius:14px;background:rgba(126,200,227,0.1);border:1px solid rgba(126,200,227,0.2);">
-        <p style="margin:0;font-size:0.88rem;color:#2A6F8F;">
+        <p style="margin:0;font-size:0.88rem;color:#7EC8E3;">
           <strong>批量处理提示：</strong>shopify1.py 逐 URL 处理，适合 10-50 个竞品分析；shopify_serper.py 批量处理 CSV 所有行，适合 100-500+ 个 SKU 的快速生成。可根据业务规模选择路径。
         </p>
       </div>
 
       <div style="margin-top:12px;padding:16px 20px;border-radius:14px;background:rgba(242,167,195,0.1);border:1px solid rgba(242,167,195,0.2);">
-        <p style="margin:0;font-size:0.88rem;color:#9B4060;">
+        <p style="margin:0;font-size:0.88rem;color:#F5B8D1;">
           <strong>Amazon 反爬注意：</strong>路径 A 使用 Playwright 真实浏览器访问 Amazon，建议：(1) 控制访问频率避免触发 CAPTCHA；(2) headless=false 方便调试观察；(3) 若被封 IP，可切换代理或等待后重试。
         </p>
       </div>
@@ -698,9 +771,6 @@ python shopify_serper.py</div>
   <script>
   (function() {
     "use strict";
-    var starsLayer=document.getElementById("starsLayer");
-    var starColors=["","star--pink","star--purple","star--cyan","star--gold"];
-    for(var i=0;i<80;i++){var s=document.createElement("div");s.className="star "+starColors[Math.floor(Math.random()*starColors.length)];var sz=Math.random()*4+1.5;s.style.cssText="width:"+sz+"px;height:"+sz+"px;top:"+Math.random()*100+"%;left:"+Math.random()*100+"%;--dur:"+(Math.random()*3+2)+"s;--delay:"+(Math.random()*5)+"s;";starsLayer.appendChild(s);}
     var canvas=document.getElementById("trailCanvas"),ctx=canvas.getContext("2d"),W,H;
     function resize(){W=canvas.width=window.innerWidth;H=canvas.height=window.innerHeight;}
     resize();window.addEventListener("resize",resize);
@@ -719,5 +789,6 @@ python shopify_serper.py</div>
     revealEls.forEach(function(el){obs.observe(el);});
   })();
   </script>
+  <script src="../starfield-bgm.js"></script>
 </body>
 </html>

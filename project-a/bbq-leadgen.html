@@ -245,13 +245,83 @@
       .arch-arrow { transform: rotate(90deg); }
       .module-grid { grid-template-columns: 1fr; }
     }
+
+    /* ====== Dark theme overrides for starfield background ====== */
+    :root {
+      --text-dark: #E0D8F0;
+      --text-mid: #B0A0CC;
+      --text-light: #7A6B98;
+      --glass-bg: rgba(20, 15, 40, 0.55);
+      --glass-border: rgba(140, 120, 200, 0.22);
+      --glass-shadow: rgba(0, 0, 0, 0.35);
+    }
+    body { background: #050510; color: #E0D8F0; }
+    .glass {
+      background: rgba(20, 15, 40, 0.55);
+      border-color: rgba(140, 120, 200, 0.22);
+      box-shadow: 0 4px 28px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.08);
+    }
+    .glass::before { background: linear-gradient(90deg, #A87CDB, #F2A7C3, #7EC8E3); }
+    .detail-hero h1 {
+      background: linear-gradient(135deg, #C9A7EB, #F5B8D1, #7EC8E3);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+    }
+    .detail-hero .subtitle { color: #B0A0CC; }
+    .eyebrow {
+      background: linear-gradient(135deg, rgba(168,124,219,0.28), rgba(242,167,195,0.28));
+      color: #C9A7EB; border-color: rgba(168,124,219,0.35);
+    }
+    .badge--purple { background: rgba(168,124,219,0.2); color: #C9A7EB; border-color: rgba(168,124,219,0.3); }
+    .badge--pink   { background: rgba(242,167,195,0.2); color: #F5B8D1; border-color: rgba(242,167,195,0.3); }
+    .badge--cyan   { background: rgba(126,200,227,0.2); color: #7EC8E3; border-color: rgba(126,200,227,0.3); }
+    .badge--gold   { background: rgba(245,197,106,0.2); color: #F5C56A; border-color: rgba(245,197,106,0.3); }
+    .sec-title { color: #E0D8F0; }
+    .sec-icon { opacity: 0.85; }
+    .arch-node--purple { background: rgba(168,124,219,0.18); color: #C9A7EB; border-color: rgba(168,124,219,0.3); }
+    .arch-node--pink   { background: rgba(242,167,195,0.18); color: #F5B8D1; border-color: rgba(242,167,195,0.3); }
+    .arch-node--cyan   { background: rgba(126,200,227,0.18); color: #7EC8E3; border-color: rgba(126,200,227,0.3); }
+    .arch-node--gold   { background: rgba(245,197,106,0.18); color: #F5C56A; border-color: rgba(245,197,106,0.3); }
+    .arch-arrow { color: #7A6B98; }
+    .file-tree { background: rgba(255,255,255,0.04); border-color: rgba(140,120,200,0.15); color: #B0A0CC; }
+    .file-tree .dir { color: #C9A7EB; }
+    .file-tree .file { color: #B0A0CC; }
+    .file-tree .comment { color: #6A5B88; }
+    .code-block { background: rgba(20,10,40,0.92); border-color: rgba(168,124,219,0.2); }
+    .api-table th { background: rgba(168,124,219,0.15); color: #E0D8F0; border-color: rgba(140,120,200,0.2); }
+    .api-table td { color: #B0A0CC; border-color: rgba(140,120,200,0.12); }
+    .api-table code { background: rgba(168,124,219,0.15); color: #C9A7EB; }
+    .method-get { background: rgba(126,200,227,0.18); color: #7EC8E3; }
+    .method-post { background: rgba(242,167,195,0.18); color: #F5B8D1; }
+    .env-table th { background: rgba(245,197,106,0.12); color: #E0D8F0; border-color: rgba(245,197,106,0.18); }
+    .env-table td { color: #B0A0CC; border-color: rgba(140,120,200,0.1); }
+    .env-table code { background: rgba(245,197,106,0.12); color: #F5C56A; }
+    .env-required { background: rgba(242,167,195,0.18); color: #F5B8D1; }
+    .env-optional { background: rgba(126,200,227,0.15); color: #7EC8E3; }
+    .p-step { background: rgba(255,255,255,0.04); border-color: rgba(140,120,200,0.12); }
+    .p-step:hover { box-shadow: 0 4px 16px rgba(168,124,219,0.12); }
+    .p-step-body h4 { color: #E0D8F0; }
+    .p-step-body p  { color: #B0A0CC; }
+    .mod-card { background: rgba(255,255,255,0.05); border-color: rgba(140,120,200,0.12); }
+    .mod-card:hover { box-shadow: 0 8px 24px rgba(168,124,219,0.12); }
+    .mod-card h4 { color: #E0D8F0; }
+    .mod-card p  { color: #B0A0CC; }
+    .schema-col { background: rgba(255,255,255,0.04); border-color: rgba(140,120,200,0.12); }
+    .schema-col .col-name { color: #E0D8F0; }
+    .btn-secondary { background: rgba(255,255,255,0.08); color: #C9A7EB; border-color: rgba(140,120,200,0.25); }
+    .btn-secondary:hover { background: rgba(255,255,255,0.15); border-color: rgba(168,124,219,0.4); }
+    .link-button { background: rgba(255,255,255,0.08); color: #C9A7EB; border-color: rgba(140,120,200,0.25); }
+    .link-button:hover { background: rgba(255,255,255,0.15); border-color: rgba(168,124,219,0.4); }
+    .footer { border-color: rgba(140,120,200,0.15); }
+    .footer p { color: #7A6B98; }
+    .mascot-wrapper { right: auto; left: 28px; filter: drop-shadow(0 8px 20px rgba(100,80,160,0.4)); }
+    .dragon-bg { display: none; }
+    ::-webkit-scrollbar-track { background: rgba(20,10,40,0.5); }
+    ::selection { background: rgba(168,124,219,0.4); color: #E0D8F0; }
   </style>
 </head>
 <body>
 
-  <!-- ====== Starry sky ====== -->
-  <div class="stars-layer" id="starsLayer" aria-hidden="true"></div>
-  <img class="dragon-bg" src="../images/kali-dragon-bg.png" alt="" aria-hidden="true" />
+  <!-- ====== Mouse trail canvas ====== -->
   <canvas id="trailCanvas" aria-hidden="true"></canvas>
 
   <div class="detail-shell">
@@ -678,7 +748,7 @@ docker run --rm -p <span class="num">8000</span>:<span class="num">8000</span> \
 SERPER_API_KEY=... SUPABASE_URL=... SUPABASE_KEY=... docker compose up --build</div>
 
       <div style="margin-top:16px;padding:16px 20px;border-radius:14px;background:rgba(245,197,106,0.12);border:1px solid rgba(245,197,106,0.25);">
-        <p style="margin:0;font-size:0.88rem;color:#8B6914;">
+        <p style="margin:0;font-size:0.88rem;color:#F5C56A;">
           <strong>依赖清单：</strong>fastapi, uvicorn, pydantic, pydantic-settings, httpx, beautifulsoup4, lxml, APScheduler, supabase, python-dateutil, pandas
         </p>
       </div>
@@ -767,17 +837,6 @@ SERPER_API_KEY=... SUPABASE_URL=... SUPABASE_KEY=... docker compose up --build</
   (function() {
     "use strict";
 
-    /* Stars */
-    var starsLayer = document.getElementById("starsLayer");
-    var starColors = ["", "star--pink", "star--purple", "star--cyan", "star--gold"];
-    for (var i = 0; i < 80; i++) {
-      var s = document.createElement("div");
-      s.className = "star " + starColors[Math.floor(Math.random() * starColors.length)];
-      var size = Math.random() * 4 + 1.5;
-      s.style.cssText = "width:"+size+"px;height:"+size+"px;top:"+Math.random()*100+"%;left:"+Math.random()*100+"%;--dur:"+(Math.random()*3+2)+"s;--delay:"+(Math.random()*5)+"s;";
-      starsLayer.appendChild(s);
-    }
-
     /* Mouse trail */
     var canvas = document.getElementById("trailCanvas");
     var ctx = canvas.getContext("2d");
@@ -848,5 +907,6 @@ SERPER_API_KEY=... SUPABASE_URL=... SUPABASE_KEY=... docker compose up --build</
     revealEls.forEach(function(el){obs.observe(el);});
   })();
   </script>
+  <script src="../starfield-bgm.js"></script>
 </body>
 </html>
