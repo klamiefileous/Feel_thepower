@@ -1,25 +1,29 @@
 /* ============================================
-   GitHub Pages Portfolio — Light Pastel Theme
-   Instagram-style pastel + starry sky
+   GitHub Pages Portfolio — Sakura Theme
+   Cherry blossom petals + fresh minimalist
    ============================================ */
 
 :root {
-  /* Pastel palette — lighter, more minimalist */
-  --lavender:       #EEE5F8;
-  --soft-pink:      #FFF0F5;
-  --sky-blue:       #D8EEFF;
-  --cream:          #FFF8F0;
-  --mint:           #DFF8E8;
-  --peach:          #FFE4CC;
+  /* Sakura palette — soft, fresh, elegant */
+  --lavender:       #F5EEF8;
+  --soft-pink:      #FFF5F8;
+  --sky-blue:       #E0F0FF;
+  --cream:          #FFFAF5;
+  --mint:           #E8F8EE;
+  --peach:          #FFE8D0;
+  --sakura-light:   #FFE4EC;
+  --sakura:         #FFB7C5;
+  --sakura-deep:    #E8649E;
+  --branch-brown:   #8B6F5E;
   --text-dark:      #3D2E5C;
   --text-mid:       #6B5B8A;
   --text-light:     #9A8BB5;
-  --glass-bg:       rgba(255, 255, 255, 0.65);
-  --glass-border:   rgba(210, 195, 240, 0.3);
-  --glass-shadow:   rgba(190, 165, 230, 0.12);
+  --glass-bg:       rgba(255, 255, 255, 0.68);
+  --glass-border:   rgba(220, 200, 235, 0.28);
+  --glass-shadow:   rgba(200, 175, 230, 0.10);
   --accent-purple:  #A87CDB;
   --accent-cyan:    #7EC8E3;
-  --accent-pink:    #F0B4CC;
+  --accent-pink:    #FFB7C5;
   --accent-gold:    #F5C56A;
   color-scheme: light;
   font-family: "Segoe UI", "PingFang SC", "Microsoft YaHei", "Helvetica Neue", Arial, sans-serif;
@@ -32,7 +36,7 @@
 /* ---------- Page body ---------- */
 body {
   min-height: 100vh;
-  background: linear-gradient(160deg, #F2ECFA 0%, #FFF5F8 30%, #EAF2FF 65%, #F8F5FC 100%);
+  background: linear-gradient(160deg, #F5EEF8 0%, #FFF5F8 25%, #FFE4EC 50%, #E8F4FF 75%, #FAF5FC 100%);
   color: var(--text-dark);
   overflow-x: hidden;
   position: relative;
@@ -58,15 +62,25 @@ body {
 }
 
 @keyframes twinkle {
-  0%, 100% { opacity: 0.1; transform: scale(0.7); }
-  50%       { opacity: 1;   transform: scale(1.3); }
+  0%, 100% { opacity: 0.05; transform: scale(0.6); }
+  50%       { opacity: 0.5;  transform: scale(1.1); }
 }
 
-/* Large colored bokeh stars */
-.star--pink   { background: var(--accent-pink);   box-shadow: 0 0 10px 3px rgba(240,180,204,0.5); }
-.star--purple { background: var(--accent-purple); box-shadow: 0 0 10px 3px rgba(168,124,219,0.5); }
-.star--cyan   { background: var(--accent-cyan);   box-shadow: 0 0 10px 3px rgba(126,200,227,0.5); }
-.star--gold   { background: var(--accent-gold);   box-shadow: 0 0 10px 3px rgba(245,197,106,0.5); }
+/* Sakura-tinted bokeh stars */
+.star--pink   { background: #FFB7C5;   box-shadow: 0 0 8px 2px rgba(255,183,197,0.4); }
+.star--purple { background: #D4B5F0;   box-shadow: 0 0 8px 2px rgba(212,181,240,0.4); }
+.star--cyan   { background: #A8D8EA;   box-shadow: 0 0 8px 2px rgba(168,216,234,0.4); }
+.star--gold   { background: #F5D98E;   box-shadow: 0 0 8px 2px rgba(245,217,142,0.4); }
+
+/* ---------- Sakura canvas layer ---------- */
+#sakuraCanvas {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 2;
+}
 
 /* ---------- Dragon background watermark ---------- */
 .dragon-bg {
@@ -155,7 +169,7 @@ body {
   font-size: clamp(2.4rem, 4.5vw, 3.8rem);
   line-height: 1.05;
   letter-spacing: -0.03em;
-  background: linear-gradient(135deg, #7B4FBF 0%, #D47A9C 50%, #5B8FD4 100%);
+  background: linear-gradient(135deg, #7B4FBF 0%, #E8649E 40%, #FFB7C5 60%, #5B8FD4 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -424,7 +438,7 @@ body {
 }
 
 .footer-heart {
-  color: var(--accent-pink);
+  color: #FFB7C5;
   display: inline-block;
   animation: heartbeat 1.4s ease-in-out infinite;
 }
@@ -459,7 +473,7 @@ body {
 ::-webkit-scrollbar { width: 8px; }
 ::-webkit-scrollbar-track { background: rgba(230,216,245,0.4); }
 ::-webkit-scrollbar-thumb {
-  background: linear-gradient(var(--accent-purple), #D4A0C0);
+  background: linear-gradient(var(--accent-purple), #FFB7C5);
   border-radius: 999px;
 }
 
