@@ -65,6 +65,20 @@
     }
   }
 
+  /* ═══════════ 水面系统 (一期一会 · 花见水面) ═══════════ */
+  var waterLine = 0.42; // 水面区域：左侧42%屏幕宽度
+  var ripples = [];
+  var floatingPetals = [];
+  var waveLines = 22;
+
+  function spawnRipple(rx, ry, strength) {
+    if (ripples.length > 15) ripples.shift();
+    ripples.push({
+      x: rx, y: ry, r: 0, maxR: (25 + Math.random() * 35) * (strength || 1),
+      alpha: 0.18 + Math.random() * 0.08, speed: 0.3 + Math.random() * 0.2, phase: 0
+    });
+  }
+
   /* ═══════════ 树干数据 ═══════════ */
   var branches = [];
   function B(x1, y1, x2, y2, w, depth) {
@@ -241,7 +255,9 @@
       pause: 0,
       paused: false,
       life: 0,
-      trail: []
+      trail: [],
+      onWater: false,
+      fadeTimer: 0
     };
   }
 
@@ -359,13 +375,13 @@
     frame++;
     updateWind();
 
-    // ── 层0: 左侧清新色洗 (薄荷绿/蜜桃/淡柠檬) ──
+    // ── 层0: 水面底色洗 (青碧/水色/深薄荷) ──
     var washDefs = [
-      [W * 0.10, H * 0.22, W * 0.40, "180,235,210", 0.22],  // 薄荷绿
-      [W * 0.15, H * 0.55, W * 0.35, "255,225,200", 0.18],  // 蜜桃暖色
-      [W * 0.06, H * 0.82, W * 0.32, "220,215,245", 0.16],  // 薰衣草紫
-      [W * 0.20, H * 0.08, W * 0.30, "210,240,205", 0.15],  // 嫩芽绿
-      [W * 0.02, H * 0.45, W * 0.25, "245,235,200", 0.12]   // 淡柠檬
+      [W * 0.10, H * 0.22, W * 0.42, "140,210,200", 0.20],  // 青碧
+      [W * 0.18, H * 0.55, W * 0.38, "170,210,230", 0.18],  // 水色浅蓝
+      [W * 0.06, H * 0.82, W * 0.34, "190,200,225", 0.15],  // 暮水紫
+      [W * 0.22, H * 0.08, W * 0.28, "160,220,200", 0.14],  // 嫩芽薄荷
+      [W * 0.02, H * 0.45, W * 0.30, "180,220,210", 0.12]   // 翡翠水色
     ];
     washDefs.forEach(function (w) {
       var wg = X.createRadialGradient(w[0] * dpr, w[1] * dpr, 0, w[0] * dpr, w[1] * dpr, w[2] * dpr);
@@ -378,21 +394,48 @@
       X.fill();
     });
 
-    // ── 层1: 光斑 (远景) ──
+    // ── 层1: 水面效果 (波纹线 + 光带 + 环境光斑) ──
+    var wlPx = W * waterLine * dpr;
+    var t = frame * 0.012;
+    // 波纹横线 — 多层正弦叠加
+    for (var wi = 0; wi < waveLines; wi++) {
+      var wy = (wi / waveLines) * H;
+      var wyBase = wy * dpr;
+      var wAlpha = 0.025 + Math.sin(t * 0.4 + wi * 0.4) * 0.015;
+      X.beginPath();
+      for (var wx = 0; wx < wlPx; wx += 3 * dpr) {
+        var wyOff = Math.sin(wx / (80 * dpr) + t + wi * 0.6) * 1.5 * dpr
+                  + Math.sin(wx / (40 * dpr) + t * 1.7 + wi * 0.3) * 0.7 * dpr;
+        if (wx === 0) X.moveTo(wx, wyBase + wyOff);
+        else X.lineTo(wx, wyBase + wyOff);
+      }
+      X.strokeStyle = "rgba(140,210,205," + wAlpha.toFixed(3) + ")";
+      X.lineWidth = (0.6 + Math.sin(t * 0.3 + wi) * 0.3) * dpr;
+      X.stroke();
+    }
+    // 水面光带 — 水平渐变
+    for (var si = 0; si < 4; si++) {
+      var sy = (0.15 + si * 0.22 + Math.sin(t * 0.2 + si) * 0.03) * H;
+      var sg = X.createLinearGradient(0, sy * dpr, wlPx * 0.85, sy * dpr);
+      sg.addColorStop(0, "rgba(200,235,230,0)");
+      sg.addColorStop(0.25, "rgba(200,235,230,0.04)");
+      sg.addColorStop(0.55, "rgba(210,240,235,0.06)");
+      sg.addColorStop(1, "rgba(200,235,230,0)");
+      X.fillStyle = sg;
+      X.fillRect(0, (sy - 10) * dpr, wlPx, 20 * dpr);
+    }
+    // 水面环境光斑（仅在左侧区域）
     bokeh.forEach(function (b) {
-      b.x += b.dx;
-      b.y += b.dy;
-      b.phase += 0.005;
-      if (b.x < -b.r) b.x = W + b.r;
-      if (b.x > W + b.r) b.x = -b.r;
+      if (b.x > W * waterLine) return;
+      b.x += b.dx; b.y += b.dy; b.phase += 0.005;
+      if (b.x < -b.r) b.x = W * waterLine + b.r;
       if (b.y < -b.r) b.y = H + b.r;
       if (b.y > H + b.r) b.y = -b.r;
-      var pulse = 1 + Math.sin(b.phase) * 0.2;
+      var pulse = 1 + Math.sin(b.phase) * 0.25;
       var r = b.r * pulse * dpr;
       var g = X.createRadialGradient(b.x * dpr, b.y * dpr, 0, b.x * dpr, b.y * dpr, r);
-      g.addColorStop(0, "rgba(255,240,220," + (b.alpha * 1.2).toFixed(3) + ")");
-      g.addColorStop(0.4, "rgba(255,230,210," + (b.alpha * 0.6).toFixed(3) + ")");
-      g.addColorStop(1, "rgba(255,230,210,0)");
+      g.addColorStop(0, "rgba(200,235,228," + (b.alpha * 0.8).toFixed(3) + ")");
+      g.addColorStop(1, "rgba(200,235,228,0)");
       X.fillStyle = g;
       X.beginPath();
       X.arc(b.x * dpr, b.y * dpr, r, 0, Math.PI * 2);
@@ -461,32 +504,97 @@
       X.restore();
     });
 
-    // ── 层3: 飘落花瓣 ──
+    // ── 层3: 飘落花瓣 (含水面触碰 + 涟漪触发) ──
     fallingPetals.forEach(function (p, idx) {
       p.life++;
-      // 偶尔暂停
-      if (p.paused) {
+      if (p.onWater) {
+        // 漂浮水面：极缓漂流 + 渐隐消融
+        p.fadeTimer++;
+        p.alpha -= 0.0008;
+        p.y += 0.05 * dpr;
+        p.x += Math.sin(frame * 0.015 + p.swingPhase) * 0.2 * dpr;
+        p.angle += 0.002;
+        if (Math.random() < 0.008 && ripples.length < 15) {
+          spawnRipple(p.x, p.y, 0.4);
+        }
+        if (p.alpha <= 0.01 || p.fadeTimer > 400) {
+          fallingPetals[idx] = spawnPetal();
+          return;
+        }
+      } else if (p.paused) {
         p.pause--;
         if (p.pause <= 0) p.paused = false;
       } else {
         p.y += p.speed * dpr;
-        // S形曲线 + 风影响
         var swing = Math.sin(p.swingPhase + p.life * p.swingFreq) * p.swingAmp * 0.015;
         var windPush = wind.power * 0.5;
         p.x += (swing + windPush) * dpr;
         p.angle += p.spin + wind.power * 0.01;
-        // 随机暂停
         if (Math.random() < 0.002 && !wind.gust) {
           p.paused = true;
           p.pause = 60 + Math.random() * 120;
         }
+        // 进入左侧水面区域 → 一期一会
+        if (p.x < W * waterLine && p.y > 30 && !p.onWater) {
+          p.onWater = true;
+          p.fadeTimer = 0;
+          p.speed = 0.08;
+          spawnRipple(p.x, p.y, 1);
+        }
       }
       drawFallingPetal(p);
-      // 超出屏幕重置
-      if (p.y > H + 30) {
-        var np = spawnPetal();
-        fallingPetals[idx] = np;
+      if (p.y > H + 30 || p.x > W + 30 || p.x < -30) {
+        fallingPetals[idx] = spawnPetal();
       }
+    });
+
+    // ── 涟漪（因果 · 一期一会） ──
+    ripples.forEach(function (rp, ri) {
+      rp.r += rp.speed * dpr;
+      rp.phase++;
+      var fade = 1 - (rp.r / (rp.maxR * dpr));
+      if (fade <= 0) { ripples.splice(ri, 1); return; }
+      // 主涟漪
+      X.beginPath();
+      X.arc(rp.x * dpr, rp.y * dpr, rp.r, 0, Math.PI * 2);
+      X.strokeStyle = "rgba(150,215,210," + (rp.alpha * fade).toFixed(3) + ")";
+      X.lineWidth = (1.2 * fade + 0.2) * dpr;
+      X.stroke();
+      // 内侧副涟漪
+      if (rp.r > 6 * dpr) {
+        X.beginPath();
+        X.arc(rp.x * dpr, rp.y * dpr, rp.r * 0.55, 0, Math.PI * 2);
+        X.strokeStyle = "rgba(170,225,220," + (rp.alpha * fade * 0.4).toFixed(3) + ")";
+        X.lineWidth = 0.6 * dpr;
+        X.stroke();
+      }
+      // 外侧幽灵涟漪
+      if (rp.r > 12 * dpr) {
+        X.beginPath();
+        X.arc(rp.x * dpr, rp.y * dpr, rp.r * 1.25, 0, Math.PI * 2);
+        X.strokeStyle = "rgba(140,205,200," + (rp.alpha * fade * 0.12).toFixed(3) + ")";
+        X.lineWidth = 0.4 * dpr;
+        X.stroke();
+      }
+    });
+
+    // ── 浮水花瓣（物哀 · 美的消逝） ──
+    fallingPetals.forEach(function (p) {
+      if (!p.onWater || p.alpha < 0.01) return;
+      X.save();
+      X.translate(p.x * dpr, p.y * dpr);
+      X.rotate(p.angle);
+      X.globalAlpha = p.alpha * 0.35;
+      // 水面倒影
+      X.scale(1, -0.45);
+      var s = p.size * dpr;
+      X.fillStyle = p.color;
+      X.beginPath();
+      X.moveTo(0, -s * 0.5);
+      X.bezierCurveTo(s * 0.4, -s * 0.08, s * 0.32, s * 0.25, 0, s * 0.4);
+      X.bezierCurveTo(-s * 0.32, s * 0.25, -s * 0.4, -s * 0.08, 0, -s * 0.5);
+      X.fill();
+      X.restore();
     });
 
     // ── 层4: 近景虚化花瓣 (前景) ──
