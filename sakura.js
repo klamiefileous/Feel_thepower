@@ -1,344 +1,497 @@
-/*  sakura.js — 逼真樱花树枝装饰 + 轻柔飘落花瓣
- *  仅用于主页 (index.html)，营造淡雅樱花氛围
- *  可选配置：window.SAKURA_CONFIG = { petals: 18, opacity: 0.30 }
+/*  sakura.js — 印象派樱花 · Canvas 全渲染
+ *  分层：远景光斑(bokeh) → 中景树(tree) → 近景虚瓣(fg)
+ *  风韵节奏：阵风4-6s → 静息8-12s → 循环
+ *  景深：远枝模糊，近枝清晰
+ *  用法：<script src="sakura.js"></script>
+ *  配置：window.SAKURA_CONFIG = { petals: 8, opacity: 0.92 }
  */
 (function () {
   "use strict";
-
   var CFG = window.SAKURA_CONFIG || {};
-  var PETAL_COUNT = CFG.petals || 18;
-  var TREE_OPACITY = CFG.opacity || 0.30;
+  var MAX_PETALS = CFG.petals || 8;
+  var GLOBAL_ALPHA = CFG.opacity || 0.92;
 
-  /* ========================================
-     1. 逼真樱花树枝 SVG
-     ======================================== */
+  /* ═══════════ Canvas Setup ═══════════ */
+  var C = document.createElement("canvas");
+  C.id = "sakuraCanvas";
+  C.style.cssText = "position:fixed;inset:0;pointer-events:none;z-index:2;";
+  document.body.appendChild(C);
+  var X = C.getContext("2d");
+  var W, H, dpr;
 
-  // 花朵生成器 — 真实5瓣樱花
-  function flower(cx, cy, size, rot, variant) {
-    var colors = [
-      { petal: "#FFCDD8", inner: "#FFE8EE", center: "#FFA0B4", stamen: "#E8649E" },
-      { petal: "#FFD6E0", inner: "#FFF0F4", center: "#FFB0C0", stamen: "#E8649E" },
-      { petal: "#FFE0E8", inner: "#FFF5F8", center: "#FFC0D0", stamen: "#D4608A" }
-    ];
-    var c = colors[variant % colors.length];
-    var svg = '<g transform="translate(' + cx + "," + cy + ") rotate(" + rot + ')">';
+  // 逻辑坐标系（树基于此坐标设计）
+  var LW = 700, LH = 600;
+  var scale = 1, offX = 0, offY = 0;
 
-    for (var i = 0; i < 5; i++) {
-      var a = i * 72;
-      svg +=
-        '<path d="M0,0 C' +
-        (size * 0.35).toFixed(1) + "," + (-size * 0.12).toFixed(1) + " " +
-        (size * 0.48).toFixed(1) + "," + (-size * 0.58).toFixed(1) + " " +
-        (size * 0.06).toFixed(1) + "," + (-size).toFixed(1) +
-        " L0," + (-size * 0.82).toFixed(1) +
-        " L" + (-size * 0.06).toFixed(1) + "," + (-size).toFixed(1) +
-        " C" + (-size * 0.48).toFixed(1) + "," + (-size * 0.58).toFixed(1) + " " +
-        (-size * 0.35).toFixed(1) + "," + (-size * 0.12).toFixed(1) +
-        ' 0,0Z" fill="' + c.petal + '" transform="rotate(' + a + ')" opacity="0.88"/>';
-    }
-    svg += '<circle r="' + (size * 0.13).toFixed(1) + '" fill="' + c.center + '"/>';
-    for (var j = 0; j < 5; j++) {
-      var sa = j * 72 + 36;
-      var sx = Math.cos((sa * Math.PI) / 180) * size * 0.2;
-      var sy = Math.sin((sa * Math.PI) / 180) * size * 0.2;
-      svg +=
-        '<circle cx="' + sx.toFixed(1) + '" cy="' + sy.toFixed(1) +
-        '" r="' + (size * 0.04).toFixed(1) + '" fill="' + c.stamen + '" opacity="0.65"/>';
-    }
-    svg += "</g>";
-    return svg;
-  }
-
-  // 花蕾 — 未开放的小花苞
-  function bud(cx, cy, size, rot) {
-    return (
-      '<ellipse cx="' + cx + '" cy="' + cy +
-      '" rx="' + (size * 0.35).toFixed(1) + '" ry="' + (size * 0.55).toFixed(1) +
-      '" fill="#FFD0DA" opacity="0.7" transform="rotate(' + rot + " " + cx + " " + cy + ')"/>'
-    );
-  }
-
-  // 花簇 — 在一个位置生成一组花（3-5朵 + 花蕾）
-  function cluster(cx, cy, baseSize, count) {
-    var svg = "";
-    for (var i = 0; i < count; i++) {
-      var angle = (i / count) * Math.PI * 2 + Math.random() * 0.5;
-      var dist = baseSize * 0.6 + Math.random() * baseSize * 0.8;
-      var fx = cx + Math.cos(angle) * dist;
-      var fy = cy + Math.sin(angle) * dist;
-      var fs = baseSize * 0.6 + Math.random() * baseSize * 0.5;
-      var fr = Math.random() * 360;
-      svg += flower(fx, fy, fs, fr, i);
-    }
-    // 加 1-2 个花蕾
-    for (var j = 0; j < 2; j++) {
-      var ba = Math.random() * Math.PI * 2;
-      var bd = baseSize * 1.0 + Math.random() * baseSize * 0.6;
-      svg += bud(
-        cx + Math.cos(ba) * bd,
-        cy + Math.sin(ba) * bd,
-        baseSize * 0.5 + Math.random() * baseSize * 0.3,
-        Math.random() * 360
-      );
-    }
-    return svg;
-  }
-
-  var svg =
-    '<svg viewBox="0 0 700 600" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMaxYMin meet">' +
-    "<defs>" +
-      // 树干渐变 — 从深棕到浅褐
-      '<linearGradient id="sk-bark" x1="0" y1="1" x2="0.3" y2="0">' +
-        '<stop offset="0%" stop-color="#5A4A3A"/>' +
-        '<stop offset="40%" stop-color="#7B6B5B"/>' +
-        '<stop offset="100%" stop-color="#8B7B6B"/>' +
-      "</linearGradient>" +
-      // 树皮纹理滤镜
-      '<filter id="sk-barkTex" x="-5%" y="-5%" width="110%" height="110%">' +
-        '<feTurbulence type="fractalNoise" baseFrequency="0.06" numOctaves="4" seed="3" result="noise"/>' +
-        '<feDisplacementMap in="SourceGraphic" in2="noise" scale="1.5" xChannelSelector="R" yChannelSelector="G"/>' +
-      "</filter>" +
-      // 柔和阴影
-      '<filter id="sk-softShadow">' +
-        '<feGaussianBlur in="SourceAlpha" stdDeviation="3"/>' +
-        '<feOffset dx="2" dy="3"/>' +
-        '<feComponentTransfer><feFuncA type="linear" slope="0.08"/></feComponentTransfer>' +
-        '<feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge>' +
-      "</filter>" +
-    "</defs>";
-
-  // ── 树干（使用 filter 增加树皮纹理感） ──
-  svg += '<g filter="url(#sk-barkTex)">';
-  // 主树干 — 粗，从右下到右上
-  svg +=
-    '<path d="M640,600 Q620,530 600,470 Q575,400 555,340 Q535,280 520,230 Q505,185 495,150 Q485,115 478,88" ' +
-    'stroke="url(#sk-bark)" stroke-width="16" fill="none" stroke-linecap="round"/>';
-  // 树干右侧纹理线
-  svg +=
-    '<path d="M630,580 Q615,520 598,465" stroke="#6B5B4B" stroke-width="1.5" fill="none" opacity="0.3" stroke-linecap="round"/>';
-  svg +=
-    '<path d="M645,590 Q625,535 608,480" stroke="#7B6B5B" stroke-width="1" fill="none" opacity="0.25" stroke-linecap="round"/>';
-
-  // ── 主树枝 ──
-  // 枝1 — 左上主枝
-  svg +=
-    '<path d="M478,88 Q440,65 390,48 Q340,32 280,25 Q240,20 195,18" ' +
-    'stroke="url(#sk-bark)" stroke-width="9" fill="none" stroke-linecap="round"/>';
-  // 枝2 — 中部左伸
-  svg +=
-    '<path d="M520,230 Q478,205 430,185 Q385,168 335,155 Q295,145 250,138" ' +
-    'stroke="url(#sk-bark)" stroke-width="7.5" fill="none" stroke-linecap="round"/>';
-  // 枝3 — 下部左伸
-  svg +=
-    '<path d="M555,340 Q520,315 480,298 Q445,282 405,270 Q375,262 340,255" ' +
-    'stroke="url(#sk-bark)" stroke-width="6" fill="none" stroke-linecap="round"/>';
-  // 枝4 — 顶部短枝
-  svg +=
-    '<path d="M478,88 Q460,55 440,35" ' +
-    'stroke="url(#sk-bark)" stroke-width="5" fill="none" stroke-linecap="round"/>';
-
-  // ── 二级分枝 ──
-  // 从枝1分出
-  svg +=
-    '<path d="M390,48 Q365,25 335,12 Q310,2 280,0" ' +
-    'stroke="url(#sk-bark)" stroke-width="5" fill="none" stroke-linecap="round"/>';
-  svg +=
-    '<path d="M280,25 Q255,8 228,2" ' +
-    'stroke="url(#sk-bark)" stroke-width="3.5" fill="none" stroke-linecap="round"/>';
-  // 从枝2分出
-  svg +=
-    '<path d="M430,185 Q405,160 375,142 Q350,128 320,118" ' +
-    'stroke="url(#sk-bark)" stroke-width="4.5" fill="none" stroke-linecap="round"/>';
-  svg +=
-    '<path d="M335,155 Q315,135 290,122" ' +
-    'stroke="url(#sk-bark)" stroke-width="3.5" fill="none" stroke-linecap="round"/>';
-  // 从枝3分出
-  svg +=
-    '<path d="M480,298 Q460,275 435,260 Q415,248 390,240" ' +
-    'stroke="url(#sk-bark)" stroke-width="4" fill="none" stroke-linecap="round"/>';
-  svg +=
-    '<path d="M405,270 Q388,252 365,242" ' +
-    'stroke="url(#sk-bark)" stroke-width="3" fill="none" stroke-linecap="round"/>';
-
-  // ── 细枝/末梢 ──
-  svg +=
-    '<path d="M195,18 Q175,10 155,8" stroke="url(#sk-bark)" stroke-width="2.5" fill="none" stroke-linecap="round"/>';
-  svg +=
-    '<path d="M280,0 Q262,-5 245,-2" stroke="url(#sk-bark)" stroke-width="2" fill="none" stroke-linecap="round"/>';
-  svg +=
-    '<path d="M320,118 Q302,108 285,102" stroke="url(#sk-bark)" stroke-width="2.5" fill="none" stroke-linecap="round"/>';
-  svg +=
-    '<path d="M340,255 Q322,248 305,245" stroke="url(#sk-bark)" stroke-width="2.5" fill="none" stroke-linecap="round"/>';
-  svg +=
-    '<path d="M390,240 Q375,232 358,228" stroke="url(#sk-bark)" stroke-width="2" fill="none" stroke-linecap="round"/>';
-  svg +=
-    '<path d="M555,340 Q540,325 520,318" stroke="url(#sk-bark)" stroke-width="3" fill="none" stroke-linecap="round"/>';
-
-  svg += "</g>"; // 结束树干 group
-
-  // ── 花朵层（带柔和阴影） ──
-  svg += '<g filter="url(#sk-softShadow)">';
-
-  // 顶部花簇 — 枝1末端
-  svg += cluster(195, 18, 14, 5);
-  svg += cluster(155, 8, 11, 3);
-  svg += cluster(240, 20, 12, 4);
-
-  // 枝1二级分枝花簇
-  svg += cluster(280, 0, 13, 4);
-  svg += cluster(245, -2, 10, 3);
-  svg += cluster(335, 12, 12, 4);
-
-  // 枝1沿途散花
-  svg += flower(350, 38, 10, 45, 0);
-  svg += flower(420, 58, 9, 120, 1);
-  svg += bud(460, 78, 7, 30);
-
-  // 枝2花簇
-  svg += cluster(250, 138, 14, 5);
-  svg += cluster(290, 122, 12, 4);
-  svg += cluster(320, 118, 13, 4);
-  svg += cluster(285, 102, 10, 3);
-
-  // 枝2沿途散花
-  svg += flower(380, 165, 9, 200, 2);
-  svg += flower(460, 200, 8, 80, 0);
-  svg += bud(500, 218, 6, 45);
-
-  // 枝3花簇
-  svg += cluster(340, 255, 13, 4);
-  svg += cluster(305, 245, 11, 3);
-  svg += cluster(390, 240, 12, 4);
-  svg += cluster(365, 242, 10, 3);
-  svg += cluster(358, 228, 9, 3);
-
-  // 枝3沿途散花
-  svg += flower(430, 278, 8, 160, 1);
-  svg += flower(510, 310, 7, 90, 2);
-  svg += bud(520, 318, 6, 60);
-
-  // 枝4（顶部短枝）花簇
-  svg += cluster(440, 35, 12, 4);
-
-  // 树干沿途零星花蕾
-  svg += bud(495, 150, 5, 20);
-  svg += bud(535, 280, 5, 70);
-  svg += bud(575, 400, 4, 110);
-
-  svg += "</g>"; // 结束花朵层
-
-  // ── 散落单瓣（增加自然感） ──
-  var singlePetalPositions = [
-    [180, 45], [220, 55], [310, 85], [370, 130],
-    [265, 160], [415, 245], [475, 290], [540, 355],
-    [300, 30], [450, 70], [350, 200]
-  ];
-  for (var sp = 0; sp < singlePetalPositions.length; sp++) {
-    var px = singlePetalPositions[sp][0];
-    var py = singlePetalPositions[sp][1];
-    var pr = Math.random() * 360;
-    var ps = 4 + Math.random() * 3;
-    svg +=
-      '<path d="M0,' + (-ps).toFixed(1) + " C" + (ps * 0.4).toFixed(1) + "," + (-ps * 0.1).toFixed(1) + " " +
-      (ps * 0.35).toFixed(1) + "," + (ps * 0.25).toFixed(1) + " 0," + (ps * 0.4).toFixed(1) +
-      " C" + (-ps * 0.35).toFixed(1) + "," + (ps * 0.25).toFixed(1) + " " +
-      (-ps * 0.4).toFixed(1) + "," + (-ps * 0.1).toFixed(1) + " 0," + (-ps).toFixed(1) +
-      'Z" fill="#FFD0DA" opacity="0.4" transform="translate(' + px + "," + py + ") rotate(" + pr + ')"/>';
-  }
-
-  svg += "</svg>";
-
-  var tree = document.createElement("div");
-  tree.className = "sakura-tree-wrap";
-  tree.setAttribute("aria-hidden", "true");
-  tree.innerHTML = svg;
-  tree.style.opacity = TREE_OPACITY;
-  document.body.appendChild(tree);
-
-  /* ========================================
-     2. 轻柔飘落花瓣（Canvas）
-     ======================================== */
-  var canvas = document.createElement("canvas");
-  canvas.id = "sakuraCanvas";
-  canvas.style.cssText =
-    "position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:2;";
-  document.body.appendChild(canvas);
-
-  var ctx = canvas.getContext("2d");
-  var W, H;
   function resize() {
-    W = canvas.width = window.innerWidth;
-    H = canvas.height = window.innerHeight;
+    dpr = window.devicePixelRatio || 1;
+    W = window.innerWidth;
+    H = window.innerHeight;
+    C.width = W * dpr;
+    C.height = H * dpr;
+    C.style.width = W + "px";
+    C.style.height = H + "px";
+    scale = Math.min(W * 0.55 / LW, H * 0.7 / LH);
+    offX = W - LW * scale + 20;
+    offY = -30;
   }
   resize();
   window.addEventListener("resize", resize);
 
-  var petalColors = [
-    "rgba(255,195,210,0.45)", "rgba(255,215,225,0.40)",
-    "rgba(255,230,238,0.35)", "rgba(255,200,215,0.40)",
-    "rgba(255,240,245,0.30)", "rgba(250,220,228,0.35)"
+  // 逻辑坐标 → Canvas像素
+  function tx(x) { return (offX + x * scale) * dpr; }
+  function ty(y) { return (offY + y * scale) * dpr; }
+  function ts(s) { return s * scale * dpr; }
+
+  /* ═══════════ 风韵节奏系统 ═══════════ */
+  var wind = { gust: false, power: 0, timer: 0, nextAt: 180, phase: 0 };
+
+  function updateWind() {
+    wind.timer++;
+    wind.phase += 0.02;
+    if (!wind.gust && wind.timer > wind.nextAt) {
+      wind.gust = true;
+      wind.timer = 0;
+      wind.nextAt = 240 + Math.random() * 180; // 静息 4-6s
+    }
+    if (wind.gust) {
+      wind.power = Math.sin((wind.timer / wind.nextAt) * Math.PI) * 0.6;
+      if (wind.timer > wind.nextAt) {
+        wind.gust = false;
+        wind.power = 0;
+        wind.timer = 0;
+        wind.nextAt = 480 + Math.random() * 240; // 阵风 8-12s
+      }
+    }
+  }
+
+  /* ═══════════ 树干数据 ═══════════ */
+  var branches = [];
+  function B(x1, y1, x2, y2, w, depth) {
+    branches.push({
+      x1: x1, y1: y1, x2: x2, y2: y2,
+      w: w, depth: depth,
+      ctrl1x: x1 + (x2 - x1) * 0.3 + (Math.random() - 0.5) * w * 2,
+      ctrl1y: y1 + (y2 - y1) * 0.3 + (Math.random() - 0.5) * w,
+      ctrl2x: x1 + (x2 - x1) * 0.7 + (Math.random() - 0.5) * w * 2,
+      ctrl2y: y1 + (y2 - y1) * 0.7 + (Math.random() - 0.5) * w,
+      phase: Math.random() * Math.PI * 2,
+      flex: 0.3 + (3 - depth) * 0.6 // 末梢更柔
+    });
+  }
+
+  // 主干
+  B(640, 600, 600, 470, 14, 0);
+  B(600, 470, 555, 340, 12, 0);
+  B(555, 340, 520, 230, 10, 0);
+  B(520, 230, 495, 150, 8, 0);
+  B(495, 150, 478, 88, 7, 0);
+
+  // 一级枝
+  B(478, 88, 390, 48, 6, 1);
+  B(390, 48, 280, 25, 5, 1);
+  B(280, 25, 195, 18, 4, 1);
+  B(520, 230, 430, 185, 5.5, 1);
+  B(430, 185, 335, 155, 4.5, 1);
+  B(335, 155, 250, 138, 3.5, 1);
+  B(555, 340, 480, 298, 4.5, 1);
+  B(480, 298, 405, 270, 3.5, 1);
+  B(405, 270, 340, 255, 3, 1);
+
+  // 二级枝
+  B(390, 48, 335, 12, 3.5, 2);
+  B(335, 12, 280, 0, 2.5, 2);
+  B(280, 25, 228, 2, 2.5, 2);
+  B(430, 185, 375, 142, 3, 2);
+  B(375, 142, 320, 118, 2.5, 2);
+  B(335, 155, 290, 122, 2.5, 2);
+  B(480, 298, 435, 260, 3, 2);
+  B(435, 260, 390, 240, 2, 2);
+  B(478, 88, 440, 35, 3.5, 2);
+
+  // 三级末梢
+  B(195, 18, 155, 8, 1.8, 3);
+  B(280, 0, 245, -2, 1.5, 3);
+  B(228, 2, 200, -5, 1.2, 3);
+  B(320, 118, 285, 102, 1.8, 3);
+  B(290, 122, 260, 110, 1.5, 3);
+  B(340, 255, 305, 245, 1.8, 3);
+  B(390, 240, 358, 228, 1.5, 3);
+  B(440, 35, 415, 15, 1.5, 3);
+
+  /* ═══════════ 花朵数据 ═══════════ */
+  var flowers = [];
+  var clusterDefs = [
+    // [cx, cy, baseSize, count, clarity(0-1)]
+    [195, 18, 14, 5, 1], [155, 8, 11, 3, 0.9], [240, 20, 12, 4, 1],
+    [280, 0, 13, 4, 0.85], [245, -2, 10, 3, 0.8], [335, 12, 12, 4, 0.9],
+    [250, 138, 14, 5, 1], [290, 122, 12, 4, 0.95], [320, 118, 13, 4, 0.9],
+    [285, 102, 10, 3, 0.85],
+    [340, 255, 13, 4, 1], [305, 245, 11, 3, 0.9], [390, 240, 12, 4, 0.95],
+    [365, 242, 10, 3, 0.85], [358, 228, 9, 3, 0.8],
+    [440, 35, 12, 4, 1]
   ];
 
-  var petals = [];
-  function createPetal() {
+  var petalColors = ["#FFCDD8", "#FFD6E0", "#FFE0E8", "#FFBFC8", "#FFE8EE"];
+  var deepColor = "#FF8A9F";
+  var highlightColor = "#FFF0F4";
+
+  clusterDefs.forEach(function (cl) {
+    var cx = cl[0], cy = cl[1], bs = cl[2], cnt = cl[3], clarity = cl[4];
+    for (var i = 0; i < cnt; i++) {
+      var a = (i / cnt) * Math.PI * 2 + Math.random() * 0.6;
+      var d = bs * 0.5 + Math.random() * bs * 0.9;
+      flowers.push({
+        x: cx + Math.cos(a) * d,
+        y: cy + Math.sin(a) * d,
+        size: bs * 0.5 + Math.random() * bs * 0.5,
+        rot: Math.random() * Math.PI * 2,
+        clarity: clarity * (0.7 + Math.random() * 0.3),
+        variant: Math.floor(Math.random() * petalColors.length),
+        phase: Math.random() * Math.PI * 2
+      });
+    }
+    // 花蕾
+    for (var j = 0; j < 2; j++) {
+      var ba = Math.random() * Math.PI * 2;
+      var bd = bs * 1.0 + Math.random() * bs * 0.5;
+      flowers.push({
+        x: cx + Math.cos(ba) * bd,
+        y: cy + Math.sin(ba) * bd,
+        size: bs * 0.3 + Math.random() * bs * 0.2,
+        rot: Math.random() * Math.PI * 2,
+        clarity: clarity * 0.6,
+        variant: -1, // 花蕾标记
+        phase: Math.random() * Math.PI * 2
+      });
+    }
+  });
+
+  // 沿途散花
+  var scatterPos = [
+    [350, 38, 9, 0.7], [420, 58, 8, 0.65], [380, 165, 8, 0.7],
+    [460, 200, 7, 0.6], [430, 278, 7, 0.65], [510, 310, 6, 0.5]
+  ];
+  scatterPos.forEach(function (s) {
+    flowers.push({
+      x: s[0], y: s[1], size: s[2],
+      rot: Math.random() * Math.PI * 2,
+      clarity: s[3], variant: Math.floor(Math.random() * petalColors.length),
+      phase: Math.random() * Math.PI * 2
+    });
+  });
+
+  /* ═══════════ 光斑数据 (木漏れ日) ═══════════ */
+  var bokeh = [];
+  for (var bi = 0; bi < 12; bi++) {
+    bokeh.push({
+      x: Math.random() * W, y: Math.random() * H,
+      r: 15 + Math.random() * 50,
+      alpha: 0.02 + Math.random() * 0.04,
+      dx: (Math.random() - 0.5) * 0.08,
+      dy: (Math.random() - 0.5) * 0.05,
+      phase: Math.random() * Math.PI * 2
+    });
+  }
+
+  /* ═══════════ 飘落花瓣 ═══════════ */
+  var fallingPetals = [];
+  function spawnPetal() {
     return {
       x: Math.random() * W,
-      y: -15 - Math.random() * H * 0.2,
-      size: Math.random() * 7 + 3,
-      speed: Math.random() * 0.5 + 0.15,
+      y: -20 - Math.random() * 60,
+      size: 4 + Math.random() * 6,
       angle: Math.random() * Math.PI * 2,
-      spin: (Math.random() - 0.5) * 0.012,
+      spin: (Math.random() - 0.5) * 0.02,
+      speed: 0.3 + Math.random() * 0.5,
+      swingAmp: 15 + Math.random() * 30,
+      swingFreq: 0.008 + Math.random() * 0.01,
       swingPhase: Math.random() * Math.PI * 2,
-      swingSpeed: Math.random() * 0.006 + 0.002,
       color: petalColors[Math.floor(Math.random() * petalColors.length)],
-      opacity: Math.random() * 0.22 + 0.15,
-      life: 0
+      alpha: 0.25 + Math.random() * 0.25,
+      pause: 0,
+      paused: false,
+      life: 0,
+      trail: []
     };
   }
 
-  for (var i = 0; i < PETAL_COUNT; i++) {
-    var p = createPetal();
-    p.y = Math.random() * H;
-    petals.push(p);
+  for (var pi = 0; pi < MAX_PETALS; pi++) {
+    var fp = spawnPetal();
+    fp.y = Math.random() * H;
+    fallingPetals.push(fp);
   }
 
-  function drawPetal(petal) {
-    ctx.save();
-    ctx.translate(petal.x, petal.y);
-    ctx.rotate(petal.angle);
-    ctx.globalAlpha = petal.opacity;
-    ctx.fillStyle = petal.color;
+  /* ═══════════ 近景虚化花瓣 ═══════════ */
+  var fgPetals = [
+    { x: 0.05, y: 0.85, size: 55, rot: 0.3, alpha: 0.06, drift: 0.0003 },
+    { x: 0.92, y: 0.15, size: 40, rot: -0.5, alpha: 0.04, drift: -0.0002 },
+    { x: 0.15, y: 0.1, size: 35, rot: 1.2, alpha: 0.035, drift: 0.0004 }
+  ];
 
-    var s = petal.size;
-    // 真实花瓣形状
-    ctx.beginPath();
-    ctx.moveTo(0, -s * 0.5);
-    ctx.bezierCurveTo(s * 0.4, -s * 0.08, s * 0.32, s * 0.25, 0, s * 0.4);
-    ctx.bezierCurveTo(-s * 0.32, s * 0.25, -s * 0.4, -s * 0.08, 0, -s * 0.5);
-    ctx.fill();
-    ctx.restore();
-  }
+  /* ═══════════ 绘制函数 ═══════════ */
 
-  function animate() {
-    ctx.clearRect(0, 0, W, H);
-    for (var i = petals.length - 1; i >= 0; i--) {
-      var pt = petals[i];
-      pt.life++;
-      pt.y += pt.speed;
-      pt.x += Math.sin(pt.swingPhase + pt.life * pt.swingSpeed) * 0.4;
-      pt.angle += pt.spin;
-      drawPetal(pt);
-      if (pt.y > H + 20) {
-        petals[i] = createPetal();
+  // 5瓣樱花
+  function drawFlower(px, py, sz, rot, clarity, variant) {
+    X.save();
+    X.translate(px, py);
+    X.rotate(rot);
+
+    if (clarity < 0.6) {
+      // 远景：简化为柔粉圆
+      var g = X.createRadialGradient(0, 0, 0, 0, 0, sz);
+      g.addColorStop(0, "rgba(255,200,215," + (clarity * 0.7).toFixed(2) + ")");
+      g.addColorStop(0.6, "rgba(255,210,220," + (clarity * 0.4).toFixed(2) + ")");
+      g.addColorStop(1, "rgba(255,220,230,0)");
+      X.fillStyle = g;
+      X.beginPath();
+      X.arc(0, 0, sz, 0, Math.PI * 2);
+      X.fill();
+    } else {
+      // 近景：5瓣花
+      var baseCol = petalColors[variant % petalColors.length];
+      for (var i = 0; i < 5; i++) {
+        X.save();
+        X.rotate((i * Math.PI * 2) / 5);
+        X.beginPath();
+        X.moveTo(0, 0);
+        X.bezierCurveTo(sz * 0.35, -sz * 0.12, sz * 0.48, -sz * 0.58, sz * 0.06, -sz);
+        X.lineTo(0, -sz * 0.82);
+        X.lineTo(-sz * 0.06, -sz);
+        X.bezierCurveTo(-sz * 0.48, -sz * 0.58, -sz * 0.35, -sz * 0.12, 0, 0);
+        X.fillStyle = baseCol;
+        X.globalAlpha = 0.85 * clarity;
+        X.fill();
+        // 花瓣脉络
+        X.strokeStyle = deepColor;
+        X.globalAlpha = 0.12 * clarity;
+        X.lineWidth = 0.3;
+        X.beginPath();
+        X.moveTo(0, -sz * 0.1);
+        X.lineTo(0, -sz * 0.7);
+        X.stroke();
+        X.restore();
+      }
+      // 花蕊
+      X.globalAlpha = 0.8 * clarity;
+      X.fillStyle = "#FFA0B4";
+      X.beginPath();
+      X.arc(0, 0, sz * 0.12, 0, Math.PI * 2);
+      X.fill();
+      // 花粉点
+      for (var j = 0; j < 5; j++) {
+        var sa = (j * Math.PI * 2) / 5 + Math.PI / 5;
+        X.fillStyle = deepColor;
+        X.globalAlpha = 0.5 * clarity;
+        X.beginPath();
+        X.arc(Math.cos(sa) * sz * 0.2, Math.sin(sa) * sz * 0.2, sz * 0.035, 0, Math.PI * 2);
+        X.fill();
       }
     }
-    requestAnimationFrame(animate);
+    X.restore();
   }
-  animate();
+
+  // 花蕾
+  function drawBud(px, py, sz, rot, clarity) {
+    X.save();
+    X.translate(px, py);
+    X.rotate(rot);
+    X.globalAlpha = 0.6 * clarity;
+    X.fillStyle = "#FFD0DA";
+    X.beginPath();
+    X.ellipse(0, 0, sz * 0.35, sz * 0.55, 0, 0, Math.PI * 2);
+    X.fill();
+    X.restore();
+  }
+
+  // 飘落花瓣形状
+  function drawFallingPetal(p) {
+    X.save();
+    X.translate(p.x * dpr, p.y * dpr);
+    X.rotate(p.angle);
+    X.globalAlpha = p.alpha;
+    X.fillStyle = p.color;
+    var s = p.size * dpr;
+    X.beginPath();
+    X.moveTo(0, -s * 0.5);
+    X.bezierCurveTo(s * 0.4, -s * 0.08, s * 0.32, s * 0.25, 0, s * 0.4);
+    X.bezierCurveTo(-s * 0.32, s * 0.25, -s * 0.4, -s * 0.08, 0, -s * 0.5);
+    X.fill();
+    X.restore();
+  }
+
+  /* ═══════════ 主渲染循环 ═══════════ */
+  var frame = 0;
+
+  function render() {
+    X.setTransform(1, 0, 0, 1, 0, 0);
+    X.clearRect(0, 0, C.width, C.height);
+    X.globalAlpha = GLOBAL_ALPHA;
+    frame++;
+    updateWind();
+
+    // ── 层1: 光斑 (远景) ──
+    bokeh.forEach(function (b) {
+      b.x += b.dx;
+      b.y += b.dy;
+      b.phase += 0.005;
+      if (b.x < -b.r) b.x = W + b.r;
+      if (b.x > W + b.r) b.x = -b.r;
+      if (b.y < -b.r) b.y = H + b.r;
+      if (b.y > H + b.r) b.y = -b.r;
+      var pulse = 1 + Math.sin(b.phase) * 0.2;
+      var r = b.r * pulse * dpr;
+      var g = X.createRadialGradient(b.x * dpr, b.y * dpr, 0, b.x * dpr, b.y * dpr, r);
+      g.addColorStop(0, "rgba(255,240,220," + (b.alpha * 1.2).toFixed(3) + ")");
+      g.addColorStop(0.4, "rgba(255,230,210," + (b.alpha * 0.6).toFixed(3) + ")");
+      g.addColorStop(1, "rgba(255,230,210,0)");
+      X.fillStyle = g;
+      X.beginPath();
+      X.arc(b.x * dpr, b.y * dpr, r, 0, Math.PI * 2);
+      X.fill();
+    });
+
+    // ── 层2: 树干 + 花朵 (中景) ──
+    // 树干（水墨风：多层半透明叠加）
+    var trunkColors = ["#4A3B44", "#5A4A52", "#6A5A60"];
+    branches.forEach(function (b) {
+      // 风偏移：末梢更柔
+      var windOff = wind.power * b.flex * Math.sin(wind.phase + b.phase) * 1.5;
+      var cx2 = b.ctrl2x + windOff * 3;
+      var ex = b.x2 + windOff * 5;
+
+      // 3层描边叠加（水墨感）
+      for (var li = 0; li < 3; li++) {
+        X.beginPath();
+        X.moveTo(tx(b.x1), ty(b.y1));
+        X.bezierCurveTo(
+          tx(b.ctrl1x), ty(b.ctrl1y),
+          tx(cx2 + li * 0.3), ty(b.ctrl2y + li * 0.2),
+          tx(ex + li * 0.5), ty(b.y2 + li * 0.3)
+        );
+        X.strokeStyle = trunkColors[li];
+        X.lineWidth = ts(b.w * (1 - li * 0.2));
+        X.globalAlpha = (0.6 - li * 0.15) * (0.5 + b.depth * 0.15);
+        X.lineCap = "round";
+        X.stroke();
+      }
+    });
+
+    // 花朵
+    flowers.forEach(function (f) {
+      // 找到最近的枝，应用风偏移
+      var windShift = wind.power * 0.8 * Math.sin(wind.phase + f.phase);
+      var fx = tx(f.x + windShift * 3);
+      var fy = ty(f.y);
+      var fz = ts(f.size);
+      var subtleRot = f.rot + wind.power * 0.05 * Math.sin(frame * 0.03 + f.phase);
+
+      if (f.variant === -1) {
+        drawBud(fx, fy, fz, subtleRot, f.clarity);
+      } else {
+        drawFlower(fx, fy, fz, subtleRot, f.clarity, f.variant);
+      }
+    });
+
+    // 散落单瓣（远景虚化）
+    var scatterPetals = [
+      [180, 45], [310, 85], [265, 160], [415, 245],
+      [475, 290], [540, 355], [300, 30], [450, 70]
+    ];
+    scatterPetals.forEach(function (sp, idx) {
+      var sx = tx(sp[0] + wind.power * 2);
+      var sy = ty(sp[1]);
+      var sr = ts(4 + (idx % 3));
+      X.save();
+      X.translate(sx, sy);
+      X.rotate(frame * 0.001 + idx);
+      X.globalAlpha = 0.25;
+      X.fillStyle = "#FFD0DA";
+      X.beginPath();
+      X.ellipse(0, 0, sr * 0.6, sr, 0, 0, Math.PI * 2);
+      X.fill();
+      X.restore();
+    });
+
+    // ── 层3: 飘落花瓣 ──
+    fallingPetals.forEach(function (p, idx) {
+      p.life++;
+      // 偶尔暂停
+      if (p.paused) {
+        p.pause--;
+        if (p.pause <= 0) p.paused = false;
+      } else {
+        p.y += p.speed * dpr;
+        // S形曲线 + 风影响
+        var swing = Math.sin(p.swingPhase + p.life * p.swingFreq) * p.swingAmp * 0.015;
+        var windPush = wind.power * 0.5;
+        p.x += (swing + windPush) * dpr;
+        p.angle += p.spin + wind.power * 0.01;
+        // 随机暂停
+        if (Math.random() < 0.002 && !wind.gust) {
+          p.paused = true;
+          p.pause = 60 + Math.random() * 120;
+        }
+      }
+      drawFallingPetal(p);
+      // 超出屏幕重置
+      if (p.y > H + 30) {
+        var np = spawnPetal();
+        fallingPetals[idx] = np;
+      }
+    });
+
+    // ── 层4: 近景虚化花瓣 (前景) ──
+    fgPetals.forEach(function (fg) {
+      fg.rot += fg.drift;
+      var fx = fg.x * W * dpr;
+      var fy = fg.y * H * dpr;
+      var fs = fg.size * dpr;
+      X.save();
+      X.translate(fx, fy);
+      X.rotate(fg.rot);
+      X.globalAlpha = fg.alpha;
+      // 大花瓣形状
+      X.fillStyle = "#FFD6E0";
+      X.beginPath();
+      X.moveTo(0, -fs * 0.5);
+      X.bezierCurveTo(fs * 0.5, -fs * 0.1, fs * 0.4, fs * 0.3, 0, fs * 0.5);
+      X.bezierCurveTo(-fs * 0.4, fs * 0.3, -fs * 0.5, -fs * 0.1, 0, -fs * 0.5);
+      X.fill();
+      // 脉络
+      X.strokeStyle = "#FFB0C0";
+      X.globalAlpha = fg.alpha * 0.3;
+      X.lineWidth = 0.5;
+      X.beginPath();
+      X.moveTo(0, -fs * 0.35);
+      X.lineTo(0, fs * 0.35);
+      X.stroke();
+      X.restore();
+    });
+
+    // ── 树影（投在背景上的淡粉阴影） ──
+    X.save();
+    X.globalAlpha = 0.02;
+    X.fillStyle = "#FFB7C5";
+    branches.forEach(function (b) {
+      if (b.depth < 2) return; // 只画细枝的影
+      var sx = tx(b.x2) + ts(20);
+      var sy = ty(b.y2) + ts(40);
+      X.beginPath();
+      X.arc(sx, sy, ts(b.w * 3), 0, Math.PI * 2);
+      X.fill();
+    });
+    X.restore();
+
+    requestAnimationFrame(render);
+  }
+
+  render();
 
   window.addEventListener("resize", function () {
-    for (var i = 0; i < petals.length; i++) {
-      petals[i].x = Math.random() * W;
-    }
+    bokeh.forEach(function (b) {
+      b.x = Math.random() * W;
+      b.y = Math.random() * H;
+    });
   });
 })();
